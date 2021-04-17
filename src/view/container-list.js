@@ -1,0 +1,3 @@
+export const createContainerListTemplate = () => {
+  return `<ul class="trip-events__list"></ul>`;
+};
