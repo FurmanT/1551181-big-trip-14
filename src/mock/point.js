@@ -30,7 +30,7 @@ const generateType = () => {
 };
 
 const getPhotos = () => {
-  return `http://picsum.photos/248/152?r=${Math.random()}`;
+  return [1,2,3].map(() => `http://picsum.photos/248/152?r=${Math.random()}`);
 };
 
 export const generatePoint = () => {
@@ -39,10 +39,12 @@ export const generatePoint = () => {
 
   return {
     type: generateType(),
-    city: generateCity(),
     options: generateOptions(),
-    description: generateDescription(),
-    photo: getPhotos(),
+    destination: {
+      name: generateCity(),
+      description: generateDescription(),
+      photos: getPhotos(),
+    },
     startDate,
     endDate,
     isFavorite: Boolean(getRandomInteger(1, 0)),

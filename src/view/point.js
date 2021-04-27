@@ -3,7 +3,7 @@ import { createOptionTemplate} from '../view/options.js';
 import { getDuration} from '../utils';
 
 export const createPointTemplate = (point) => {
-  const { startDate, endDate, type, city, price, photo , options, isFavorite } = point;
+  const { startDate, endDate, type, destination , price,  options, isFavorite } = point;
   const currentOptions = OPTIONS.filter((value )=>(options.indexOf(value.id) !== -1), options);
   const templateOptions = currentOptions.reduce((result, currentValue) =>  {
     return result + createOptionTemplate(currentValue);
@@ -15,9 +15,9 @@ export const createPointTemplate = (point) => {
             <div class="event">
               <time class="event__date" datetime="${startDate.format('YYYY-MM-DD')}">${startDate.format('MMM DD')}</time>
               <div class="event__type">
-                <img class="event__type-icon" width="42" height="42" src="${photo}" alt="Event type icon">
+              ${(destination.photos) ? `<img class="event__type-icon" width="42" height="42" src="${destination.photos[0]}" alt="Event type icon">`: '' }
               </div>
-              <h3 class="event__title">${type} ${city}</h3>
+              <h3 class="event__title">${type} ${destination.name}</h3>
               <div class="event__schedule">
                 <p class="event__time">
                   <time class="event__start-time" datetime="${startDate.format('DD/MM/YYYY H:mm')}">${startDate.format('HH:mm')}</time>

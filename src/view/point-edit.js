@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import {CITIES, TYPES, OPTIONS} from '../const';
 
 const createPointEditOptionsTemplate = (currentOptions) => {
@@ -28,21 +27,22 @@ const createCityTemplate = (current) => {
            name="event-destination" value="${current}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${CITIES.map((city) => {
-              return `<option value="${city}"></option>`;
-            }).join('')}
+    return `<option value="${city}"></option>`;
+  }).join('')}
           </datalist>`;
 };
 
 export const createPointEditTemplate = (point = {}) => {
   const {
     type = '',
-    city = '',
     options = [],
-    description = '',
-    photo = '',
+    destination = {
+      name: '',
+      description: [],
+      photo: [],
+    },
     startDate = '',
     endDate = '',
-    isFavorite = false,
     price = 0,
   } = point;
 
@@ -67,7 +67,7 @@ export const createPointEditTemplate = (point = {}) => {
         <label class="event__label  event__type-output" for="event-destination-1">
           ${type ? type : ''}
         </label>
-          ${createCityTemplate(city)}
+          ${createCityTemplate(destination.name)}
       </div>
 
       <div class="event__field-group  event__field-group--time">
@@ -101,20 +101,17 @@ export const createPointEditTemplate = (point = {}) => {
       </section>
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">${description}</p>
+        <p class="event__destination-description">${destination.description}</p>
       </section>
     </section>
 
-    ${(photo ==='' ?
-    `<div class="event__photos-container">
-          <div class="event__photos-tape">
-            <img class="event__photo" src="img/photos/1.jpg" alt="Event photo">
-            <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
-            <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
-            <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
-            <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">
-          </div>
-        </div>` : '')}
-  </form>
+    <div class="event__photos-container">
+      <div class="event__photos-tape">
+      ${destination.photos ?
+    (destination.photos.map((photo) =>
+      `<img class="event__photo" src="${photo}" alt="Event photo">`)) : ''}
+      </div>
+    </div>
+   </form>
 </li>`;
 };
