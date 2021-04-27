@@ -1,4 +1,3 @@
 export const createContainerTripInfo = () => {
-  return `<section class="trip-main__trip-info  trip-info">
-          </section>`;
-}
+  return '<section class="trip-main__trip-info  trip-info"></section>';
+};
