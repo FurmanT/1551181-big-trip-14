@@ -2,6 +2,11 @@ import dayjs from 'dayjs';
 // eslint-disable-next-line no-undef
 const duration = require('dayjs/plugin/duration');
 dayjs.extend(duration);
+export const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+};
+
 export const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
@@ -24,3 +29,19 @@ export const getDuration = (start, end) => {
   return '';
 };
 
+export const render = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+  }
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement('div'); // 1
+  newElement.innerHTML = template;
+  return newElement.firstChild;
+};

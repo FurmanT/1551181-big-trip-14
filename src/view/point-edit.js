@@ -1,4 +1,18 @@
 import {CITIES, TYPES, OPTIONS} from '../const';
+import {createElement} from '../utils';
+
+const BLANK_POINT = {
+  type: '',
+  options: [],
+  destination: {
+    name: '',
+    description: [],
+    photo: [],
+  },
+  startDate: '',
+  endDate: '',
+  price: 0,
+};
 
 const createPointEditOptionsTemplate = (currentOptions) => {
   return OPTIONS.map((option)=>
@@ -32,20 +46,8 @@ const createCityTemplate = (current) => {
           </datalist>`;
 };
 
-export const createPointEditTemplate = (point = {}) => {
-  const {
-    type = '',
-    options = [],
-    destination = {
-      name: '',
-      description: [],
-      photo: [],
-    },
-    startDate = '',
-    endDate = '',
-    price = 0,
-  } = point;
-
+const createPointEditTemplate = (point) => {
+  const {type, destination,startDate, endDate, price , options } = point;
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -115,3 +117,26 @@ export const createPointEditTemplate = (point = {}) => {
    </form>
 </li>`;
 };
+
+export default class PointEdit {
+  constructor(point = BLANK_POINT) {
+    this._element = null;
+    this._point = point;
+  }
+
+  getTemplate() {
+    return createPointEditTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
