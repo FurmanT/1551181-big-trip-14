@@ -1,8 +1,8 @@
 import {OPTIONS} from '../const';
 import { createOptionTemplate} from '../view/options.js';
-import { getDuration} from '../utils';
+import {createElement, getDuration} from '../utils';
 
-export const createPointTemplate = (point) => {
+const createPointTemplate = (point) => {
   const { startDate, endDate, type, destination , price,  options, isFavorite } = point;
   const currentOptions = OPTIONS.filter((value )=>(options.indexOf(value.id) !== -1), options);
   const templateOptions = currentOptions.reduce((result, currentValue) =>  {
@@ -45,3 +45,26 @@ export const createPointTemplate = (point) => {
               </div>
             </li>`;
 };
+
+export default class PointView {
+  constructor(point) {
+    this._element = null;
+    this._point = point;
+  }
+
+  getTemplate() {
+    return createPointTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
