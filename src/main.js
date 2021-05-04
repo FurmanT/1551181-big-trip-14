@@ -11,7 +11,7 @@ import PointView from './view/point.js';
 import PointEditView from './view/point-edit.js';
 import {generatePoint} from './mock/point';
 
-const POINT_COUNT = 4;
+const POINT_COUNT = 40;
 const points = Array(POINT_COUNT).fill().map(generatePoint);
 
 const siteMainElement = document.querySelector('.page-main');
@@ -21,25 +21,29 @@ const tripMainElement = siteHeaderElement.querySelector('.trip-main');
 const tripControlElements = tripMainElement.querySelector('.trip-controls');
 const siteMenuElement = tripControlElements.querySelector('.trip-controls__navigation');
 const siteFilterElement = tripControlElements.querySelector('.trip-controls__filters');
+let element;
 
+const replaceElement = (container, newElement, curElement) => {
+  container.replaceChild(newElement, curElement);
+};
 
 const renderPoint = (poinListElement, point) => {
   const pointComponent = new PointView(point);
   const pointEditComponent = new PointEditView(point);
 
-  const replaceCardToForm = () => {
-    poinListElement.replaceChild(pointEditComponent.getElement(), pointComponent.getElement());
-  };
-
-  const replaceFormToCard = () => {
-    poinListElement.replaceChild(pointComponent.getElement(), pointEditComponent.getElement());
-  };
   pointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
-    replaceCardToForm();
+    if (element){
+      const form = poinListElement.querySelector('form');
+      const li = form.closest('.trip-events__item');
+      replaceElement(poinListElement, element , li);
+    }
+    element = pointComponent.getElement();
+    replaceElement(poinListElement, pointEditComponent.getElement(), pointComponent.getElement());
   });
+
   pointEditComponent.getElement().querySelector('form').addEventListener('submit', (evt) => {
     evt.preventDefault();
-    replaceFormToCard();
+    replaceElement(poinListElement, pointComponent.getElement() , pointEditComponent.getElement());
   });
   render(poinListElement, pointComponent.getElement(), RenderPosition.BEFOREEND);
 };
@@ -58,7 +62,7 @@ render(tripEventsElement, new SortView().getElement(), RenderPosition.BEFOREEND)
 const containerList = new ContainerListView();
 render(tripEventsElement , containerList.getElement(), RenderPosition.BEFOREEND);
 
-for (let i = 1; i < POINT_COUNT; i++) {
+for (let i = 0; i <= POINT_COUNT - 1; i++) {
   renderPoint(containerList.getElement(), points[i]);
 }
 
