@@ -1,5 +1,5 @@
 import {CITIES, TYPES, OPTIONS} from '../const';
-import {createElement} from '../utils';
+import AbstractView from './abstract.js';
 
 const BLANK_POINT = {
   type: '',
@@ -118,25 +118,35 @@ const createPointEditTemplate = (point) => {
 </li>`;
 };
 
-export default class PointEdit {
+export default class PointEdit extends AbstractView {
   constructor(point = BLANK_POINT) {
-    this._element = null;
+    super();
     this._point = point;
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._closeClickHandler = this._closeClickHandler.bind(this);
   }
 
   getTemplate() {
     return createPointEditTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
   }
 
-  removeElement() {
-    this._element = null;
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
+  }
+
+  _closeClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.closeClick();
+  }
+
+  setCloseClickHandler(callback) {
+    this._callback.closeClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._closeClickHandler);
   }
 }
