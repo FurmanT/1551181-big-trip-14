@@ -1,7 +1,7 @@
 import {generateOptions} from './options.js';
 import dayjs from 'dayjs';
 import {TYPES, CITIES, DESCRIPTION} from '../const';
-import {getRandomInteger} from '../utils';
+import {getRandomInteger} from '../utils/common';
 
 const generateDescription = () => {
   const randomCount = getRandomInteger(1, 5);

@@ -1,4 +1,4 @@
-import {getRandomInteger} from '../utils';
+import {getRandomInteger} from '../utils/common';
 import {OPTIONS} from '../const';
 
 export const generateOptions = () => {

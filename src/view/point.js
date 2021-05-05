@@ -1,12 +1,14 @@
 import {OPTIONS} from '../const';
-import { createOptionTemplate} from '../view/options.js';
-import {createElement, getDuration} from '../utils';
+// import {createOptionTemplate} from '../view/options.js';
+import OptionsView from '../view/options.js';
+import {getDuration} from '../utils/common';
+import AbstractView from './abstract.js';
 
 const createPointTemplate = (point) => {
   const { startDate, endDate, type, destination , price,  options, isFavorite } = point;
   const currentOptions = OPTIONS.filter((value )=>(options.indexOf(value.id) !== -1), options);
   const templateOptions = currentOptions.reduce((result, currentValue) =>  {
-    return result + createOptionTemplate(currentValue);
+    return result + new OptionsView(currentValue).getTemplate();
   }, '');
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active': '';
   const duration = getDuration(startDate, endDate);
@@ -46,25 +48,24 @@ const createPointTemplate = (point) => {
             </li>`;
 };
 
-export default class PointView {
+export default class PointView extends AbstractView {
   constructor(point) {
-    this._element = null;
+    super();
     this._point = point;
+    this._editClickHandler = this._editClickHandler.bind(this);
   }
 
   getTemplate() {
     return createPointTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _editClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.editClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setEditClickHandler(callback) {
+    this._callback.editClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editClickHandler);
   }
 }
