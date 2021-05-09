@@ -4,6 +4,8 @@ import SortView from '../view/sort';
 import ContainerListView from '../view/container-list';
 import PointPresenter from './point';
 import {updateItem} from '../utils/common.js';
+import {SortType} from '../const.js';
+import {sortPointUpPrice, sortPointUpTime} from '../utils/point';
 
 export default class Trip {
   constructor(tripContainer) {
@@ -14,10 +16,13 @@ export default class Trip {
     this._pointPresenter = {};
     this._handlePointChange = this._handlePointChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._currentSortType = SortType.DAY;
   }
 
   init(points) {
-    this._points = points;
+    this._points = points.slice();
+    this._sourcedTripPoint = points.slice();
     this._renderTrip();
   }
 
@@ -34,6 +39,31 @@ export default class Trip {
 
   _renderSort() {
     render(this._tripContainer, this._sortComponent, RenderPosition.BEFOREEND);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+  }
+
+  _sortTasks(sortType) {
+    switch (sortType) {
+      case SortType.PRICE:
+        this._points.sort(sortPointUpPrice);
+        break;
+      case SortType.TIME:
+        this._points.sort(sortPointUpTime);
+        break;
+      case SortType.DAY:
+        this._points = this._sourcedTripPoint;
+        break;
+    }
+    this._currentSortType = sortType;
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+    this._sortTasks(sortType);
+    this._clearPointList();
+    this._renderPoints();
   }
 
   _renderPoint(point) {

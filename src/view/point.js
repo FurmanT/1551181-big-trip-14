@@ -1,8 +1,8 @@
 import {OPTIONS} from '../const';
-// import {createOptionTemplate} from '../view/options.js';
 import OptionsView from '../view/options.js';
 import {getDuration} from '../utils/common';
 import AbstractView from './abstract.js';
+import dayjs from 'dayjs';
 
 const createPointTemplate = (point) => {
   const { startDate, endDate, type, destination , price,  options, isFavorite } = point;
@@ -15,16 +15,16 @@ const createPointTemplate = (point) => {
 
   return `<li class="trip-events__item">
             <div class="event">
-              <time class="event__date" datetime="${startDate.format('YYYY-MM-DD')}">${startDate.format('MMM DD')}</time>
+              <time class="event__date" datetime="${dayjs(startDate).format('YYYY-MM-DD')}">${dayjs(startDate).format('MMM DD')}</time>
               <div class="event__type">
               ${(destination.photos) ? `<img class="event__type-icon" width="42" height="42" src="${destination.photos[0]}" alt="Event type icon">`: '' }
               </div>
               <h3 class="event__title">${type} ${destination.name}</h3>
               <div class="event__schedule">
                 <p class="event__time">
-                  <time class="event__start-time" datetime="${startDate.format('DD/MM/YYYY H:mm')}">${startDate.format('HH:mm')}</time>
+                  <time class="event__start-time" datetime="${dayjs(startDate).format('DD/MM/YYYY H:mm')}">${dayjs(startDate).format('HH:mm')}</time>
                    &mdash;
-                  <time class="event__end-time" datetime="${endDate.format('DD/MM/YYYY H:mm')}">${endDate.format('HH:mm')}</time>
+                  <time class="event__end-time" datetime="${dayjs(endDate).format('DD/MM/YYYY H:mm')}">${dayjs(endDate).format('HH:mm')}</time>
                 </p>
                 <p class="event__duration">${duration}</p>
               </div>
