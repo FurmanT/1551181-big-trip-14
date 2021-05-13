@@ -74,6 +74,7 @@ export default class Point {
   _escKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+      this._pointEditComponent.reset(this._point);
       this._replaceFormToCard();
       document.removeEventListener('keydown', this._escKeyDownHandler);
     }
@@ -82,7 +83,6 @@ export default class Point {
   _handleEditClick() {
     this._replaceCardToForm();
   }
-
 
   _handleFormSubmit(point) {
     this._changeData(point);

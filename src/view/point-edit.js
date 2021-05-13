@@ -136,6 +136,12 @@ export default class PointEdit extends SmartView {
     this._setInnerHandlers();
   }
 
+  reset(point) {
+    this.updateData(
+      PointEdit.parsePointToState(point),
+    );
+  }
+
   static parsePointToState(point) {
     return Object.assign(
       {},
