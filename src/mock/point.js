@@ -30,10 +30,6 @@ const generateType = () => {
   return TYPES[randomIndex];
 };
 
-// const getPhotos = () => {
-//   return [1,2,3].map(() => `http://picsum.photos/248/152?r=${Math.random()}`);
-// };
-
 export const generatePoint = () => {
   const startDate =  dayjs(+(dayjs()) - Math.floor(Math.random()*10000000000)).format('YYYY-MM-DD HH:mm');
   const endDate =  dayjs(+(dayjs()) + Math.floor(Math.random()*10000000000)).format('YYYY-MM-DD HH:mm');

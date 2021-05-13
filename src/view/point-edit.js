@@ -1,5 +1,5 @@
 import {DESTINATIONS, TYPES } from '../const';
-import AbstractView from './abstract.js';
+import SmartView from './smart.js';
 import dayjs from 'dayjs';
 import {getOptionsByType} from '../mock/options';
 
@@ -124,7 +124,7 @@ const createPointEditTemplate = (point) => {
 </li>`;
 };
 
-export default class PointEdit extends AbstractView {
+export default class PointEdit extends SmartView {
   constructor(point = BLANK_POINT) {
     super();
     this._state = PointEdit.parsePointToState(point);
@@ -132,6 +132,7 @@ export default class PointEdit extends AbstractView {
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._destinationClickHandler = this._destinationClickHandler.bind(this);
     this._typeClickHandler = this._typeClickHandler.bind(this);
+    this._priceClickHandler = this._priceClickHandler.bind(this);
     this._setInnerHandlers();
   }
 
@@ -147,7 +148,6 @@ export default class PointEdit extends AbstractView {
 
   static parseStateToPoint(state) {
     state = Object.assign({}, state);
-
     return state;
   }
 
@@ -163,6 +163,9 @@ export default class PointEdit extends AbstractView {
     this.getElement()
       .querySelector('.event__input--destination')
       .addEventListener('change', this._destinationClickHandler);
+    this.getElement()
+      .querySelector('.event__input--price')
+      .addEventListener('change', this._priceClickHandler);
   }
 
   _destinationClickHandler(evt) {
@@ -184,27 +187,11 @@ export default class PointEdit extends AbstractView {
     });
   }
 
-  updateElement() {
-    const prevElement = this.getElement();
-    const parent = prevElement.parentElement;
-    this.removeElement();
-    const newElement = this.getElement();
-    parent.replaceChild(newElement, prevElement);
-    this.restoreHandlers();
-  }
-
-  updateData(update) {
-    if (!update) {
-      return;
-    }
-
-    this._state = Object.assign(
-      {},
-      this._state,
-      update,
-    );
-
-    this.updateElement();
+  _priceClickHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      price: evt.target.value,
+    }, true);
   }
 
   getTemplate() {
