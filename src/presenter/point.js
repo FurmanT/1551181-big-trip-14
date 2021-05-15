@@ -91,6 +91,7 @@ export default class Point {
 
 
   _handleCloseClick() {
+    this._pointEditComponent.reset(this._point);
     this._replaceFormToCard();
   }
 

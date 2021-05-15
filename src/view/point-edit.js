@@ -16,17 +16,22 @@ const BLANK_POINT = {
   price: 0,
 };
 
-const createPointEditOptionsTemplate = (currentOptions, optionsByType) => {
-  return optionsByType.map((option)=>
-    `<div class="event__offer-selector">
-     <input class="event__offer-checkbox  visually-hidden" id="event-offer-${option.name}-1" type="checkbox"
-           name="event-offer-${option.name}" ${(currentOptions.indexOf(option) === -1 ? '' : 'checked')}>
-      <label class="event__offer-label" htmlFor="event-offer-${option.name}-1">
+const createPointEditOptionsTemplate = (selectedOptions, typeOptions) => {
+  return typeOptions.map((option) => {
+    const name = option.title.toLowerCase().replace(/ /g, '-');
+
+    const isChecked = (selectedOptions.findIndex((item) => (
+      item.title === option.title))) === -1 ? '' : 'checked';
+
+    return `<div class="event__offer-selector">
+     <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox"
+           name="event-offer-${name}" ${isChecked}>
+      <label class="event__offer-label" htmlFor="event-offer-${name}-1">
         <span class="event__offer-title">${option.title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${option.price}</span>
       </label>
-  </div>` ).join('');
+  </div>`;}).join('');
 };
 
 const createEventTypeTemplate = (current) => {
@@ -49,7 +54,7 @@ const createCityTemplate = (current) => {
 };
 
 const createPointEditTemplate = (point) => {
-  const {type, destination, startDate, endDate, price, options} = point;
+  const {type, destination, startDate, endDate, price, options, isOption} = point;
   const optionType = getOptionsByType(type);
 
   return `<li class="trip-events__item">
@@ -101,12 +106,15 @@ const createPointEditTemplate = (point) => {
       </button>
     </header>
     <section class="event__details">
-      <section class="event__section  event__section--offers">
+
+    ${isOption ?
+    `<section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
         <div class="event__available-offers">
           ${createPointEditOptionsTemplate(options, optionType)}
         </div>
-      </section>
+      </section>` : ''}
+
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
         <p class="event__destination-description">${destination.description}</p>
@@ -133,6 +141,7 @@ export default class PointEdit extends SmartView {
     this._destinationClickHandler = this._destinationClickHandler.bind(this);
     this._typeClickHandler = this._typeClickHandler.bind(this);
     this._priceClickHandler = this._priceClickHandler.bind(this);
+    this._optionChangeHandler = this._optionChangeHandler.bind(this);
     this._setInnerHandlers();
   }
 
@@ -160,6 +169,7 @@ export default class PointEdit extends SmartView {
   restoreHandlers() {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setCloseClickHandler(this._callback.closeClick);
   }
 
   _setInnerHandlers() {
@@ -172,6 +182,43 @@ export default class PointEdit extends SmartView {
     this.getElement()
       .querySelector('.event__input--price')
       .addEventListener('change', this._priceClickHandler);
+    if (this._state.isOption) {
+      this.getElement()
+        .querySelector('.event__available-offers')
+        .addEventListener('click', this._optionChangeHandler);
+    }
+  }
+
+  _optionChangeHandler(evt) {
+    if (evt.target.tagName !== 'LABEL') {
+      return;
+    }
+    evt.preventDefault();
+    this.optionType = getOptionsByType(this._state.type);
+    const selectTitleOption = evt.target.firstElementChild.outerText;
+    const selectOption = this.optionType.filter((element) => {
+      return element.title === selectTitleOption;
+    });
+    const cloneOptionsState = []; // новый пустой объект
+    const options = Object.assign({}, this._state.options);
+    for (const key in options) {
+      cloneOptionsState[key] = Object.assign({}, options[key]);
+    }
+    if (cloneOptionsState.length !== 0){
+      const search = cloneOptionsState.findIndex((option) =>(
+        option.title === selectOption[0].title));
+      if (search === -1) {
+        cloneOptionsState.push(selectOption[0]);
+      } else {
+        cloneOptionsState.splice(search, 1);
+      }
+    }  else {
+      cloneOptionsState.push(selectOption[0]);
+    }
+
+    this.updateData({
+      options: cloneOptionsState,
+    });
   }
 
   _destinationClickHandler(evt) {

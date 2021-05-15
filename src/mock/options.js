@@ -19,6 +19,7 @@ export const generateRandomOptions = (OPTIONBYTYPE) => {
 };
 
 export const getOptionsByType = (type) => {
+  if (!type) return [];
   for (let i = 0; i < OPTIONS.length; i++) {
     if ( OPTIONS[i].type === type) {
       return OPTIONS[i].offers;
