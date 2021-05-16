@@ -1,4 +1,3 @@
-import {OPTIONS} from '../const';
 import OptionsView from '../view/options.js';
 import {getDuration} from '../utils/common';
 import AbstractView from './abstract.js';
@@ -6,8 +5,7 @@ import dayjs from 'dayjs';
 
 const createPointTemplate = (point) => {
   const { startDate, endDate, type, destination , price,  options, isFavorite } = point;
-  const currentOptions = OPTIONS.filter((value )=>(options.indexOf(value.id) !== -1), options);
-  const templateOptions = currentOptions.reduce((result, currentValue) =>  {
+  const templateOptions = options.reduce((result, currentValue) =>  {
     return result + new OptionsView(currentValue).getTemplate();
   }, '');
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active': '';
@@ -17,7 +15,7 @@ const createPointTemplate = (point) => {
             <div class="event">
               <time class="event__date" datetime="${dayjs(startDate).format('YYYY-MM-DD')}">${dayjs(startDate).format('MMM DD')}</time>
               <div class="event__type">
-              ${(destination.photos) ? `<img class="event__type-icon" width="42" height="42" src="${destination.photos[0]}" alt="Event type icon">`: '' }
+                <img class="event__type-icon" width="42" height="42"  src="img/icons/${type}.png"  alt="Event type icon">
               </div>
               <h3 class="event__title">${type} ${destination.name}</h3>
               <div class="event__schedule">
