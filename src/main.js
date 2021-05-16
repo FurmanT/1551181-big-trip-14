@@ -6,9 +6,8 @@ import {generatePoint} from './mock/point';
 import Trip from './presenter/trip';
 import TripHeader from './presenter/trip-header';
 
-const POINT_COUNT = 40;
+const POINT_COUNT = 1;
 const points = Array(POINT_COUNT).fill().map(generatePoint);
-
 const siteHeaderElement = document.querySelector('.page-header');
 const tripMainElement = siteHeaderElement.querySelector('.trip-main');
 

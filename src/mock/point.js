@@ -31,8 +31,8 @@ const generateType = () => {
 };
 
 export const generatePoint = () => {
-  const startDate =  dayjs(+(dayjs()) - Math.floor(Math.random()*10000000000)).format('YYYY-MM-DD HH:mm');
-  const endDate =  dayjs(+(dayjs()) + Math.floor(Math.random()*10000000000)).format('YYYY-MM-DD HH:mm');
+  const startDate =  dayjs(+(dayjs()) - Math.floor(Math.random()*10000000000)).format('YYYY-MM-DDTHH:mm');
+  const endDate =  dayjs(+(dayjs()) + Math.floor(Math.random()*10000000000)).format('YYYY-MM-DDTHH:mm');
   const type =  generateType();
   const optionType = getOptionsByType(type);
   const options = generateRandomOptions(optionType);
