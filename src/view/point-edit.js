@@ -18,7 +18,7 @@ const BLANK_POINT = {
 
 const createPointEditOptionsTemplate = (selectedOptions, typeOptions) => {
   return typeOptions.map((option) => {
-    const name = option.title.toLowerCase().replace(/ /g, '-');
+    const name = option.title.toLowerCase().replace(/\s/g, '-');
 
     const isChecked = (selectedOptions.findIndex((item) => (
       item.title === option.title))) === -1 ? '' : 'checked';
