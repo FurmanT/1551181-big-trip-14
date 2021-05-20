@@ -3,10 +3,11 @@ import SmartView from './smart.js';
 import dayjs from 'dayjs';
 import {getOptionsByType} from '../mock/options';
 import flatpickr from 'flatpickr';
+import he from 'he';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
-  type: '',
+  type: TYPES[0],
   options: [],
   destination: {
     name: '',
@@ -58,7 +59,8 @@ const createCityTemplate = (current) => {
 const createPointEditTemplate = (point) => {
   const {type, destination, startDate, endDate, price, options, isOption} = point;
   const optionType = getOptionsByType(type);
-
+  const dateTo =  endDate ? dayjs(endDate).format('DD/MM/YY HH:mm') : '';
+  const dateFrom = startDate ? dayjs(startDate).format('DD/MM/YY HH:mm') : '';
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -86,12 +88,11 @@ const createPointEditTemplate = (point) => {
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
         <input class="event__input  event__input--time event-start-time-1" id="event-start-time-1" type="text" name="event-start-time"
-        value="${startDate ? dayjs(startDate).format('DD/MM/YY HH:mm') : ''}">
-
+        value="${he.encode(dateFrom)}">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
         <input class="event__input  event__input--time event-end-time-1" id="event-end-time-1" type="text" name="event-end-time"
-        value="${endDate ? dayjs(endDate).format('DD/MM/YY HH:mm') : ''}">
+        value="${he.encode(dateTo)}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -99,7 +100,7 @@ const createPointEditTemplate = (point) => {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+        <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -142,6 +143,7 @@ export default class PointEdit extends SmartView {
     this._datepickerFrom = null;
     this._datepickerTo = null;
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._formDeleteHandler = this._formDeleteHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._destinationClickHandler = this._destinationClickHandler.bind(this);
     this._typeClickHandler = this._typeClickHandler.bind(this);
@@ -161,7 +163,7 @@ export default class PointEdit extends SmartView {
 
   _endDateChangeHandler([userDate]) {
     this.updateData({
-      endDate:  dayjs(userDate).format('YYYY-MM-DDTHH:mm') ,
+      endDate: dayjs(userDate).format('YYYY-MM-DDTHH:mm') ,
     });
   }
 
@@ -224,6 +226,7 @@ export default class PointEdit extends SmartView {
     this._setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setCloseClickHandler(this._callback.closeClick);
+    this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
   _setInnerHandlers() {
@@ -278,6 +281,10 @@ export default class PointEdit extends SmartView {
   _destinationClickHandler(evt) {
     evt.preventDefault();
     const selectedDestination = DESTINATIONS.find((destination) => destination.name === evt.target.value);
+    if (!selectedDestination) {
+      evt.target.setCustomValidity('Выберите город из списка');
+      return;
+    }
     this.updateData({
       destination: selectedDestination,
     });
@@ -315,6 +322,17 @@ export default class PointEdit extends SmartView {
     this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
   }
 
+  _formDeleteHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(PointEdit.parseStateToPoint(this._state));
+  }
+
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteHandler );
+  }
+
   _closeClickHandler(evt) {
     evt.preventDefault();
     this._callback.closeClick();
@@ -323,5 +341,14 @@ export default class PointEdit extends SmartView {
   setCloseClickHandler(callback) {
     this._callback.closeClick = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._closeClickHandler);
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
   }
 }

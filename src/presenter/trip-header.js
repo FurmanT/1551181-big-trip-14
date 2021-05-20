@@ -4,13 +4,14 @@ import ContainerTripInfoView from '../view/container-trip-info.js';
 import MainTripInfoView from '../view/trip-info-main.js';
 
 export default class TripHeader {
-  constructor(container) {
+  constructor(container, pointsModel) {
+    this._pointsModel = pointsModel;
     this._container = container;
     this._tripInfoComponent = new ContainerTripInfoView();
   }
 
-  init(points) {
-    this._tripInfo = generateTripInfo(points);
+  init() {
+    this._tripInfo = generateTripInfo(this._pointsModel.getPoints());
     this._render();
   }
 
