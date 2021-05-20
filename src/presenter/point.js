@@ -1,6 +1,8 @@
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import PointView from '../view/point';
 import PointEditView from '../view/point-edit';
+import {UserAction, UpdateType} from '../const.js';
+import { isDatesEqual } from '../utils/point.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -20,6 +22,7 @@ export default class Point {
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
   init(point) {
@@ -34,7 +37,7 @@ export default class Point {
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setCloseClickHandler(this._handleCloseClick);
-
+    this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
       return;
@@ -84,19 +87,36 @@ export default class Point {
     this._replaceCardToForm();
   }
 
-  _handleFormSubmit(point) {
-    this._changeData(point);
+  _handleFormSubmit(update) {
+
+    const isMinorUpdate = !isDatesEqual(this._point.startDate, update.startDate) ||
+    !isDatesEqual(this._point.startDate, update.startDate) ;
+
+    this._changeData(
+      UserAction.UPDATE_POINT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      update,
+    );
     this._replaceFormToCard();
   }
-
 
   _handleCloseClick() {
     this._pointEditComponent.reset(this._point);
     this._replaceFormToCard();
   }
 
+  _handleDeleteClick(point) {
+    this._changeData(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
+  }
+
   _handleFavoriteClick() {
     this._changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
       Object.assign(
         {},
         this._point,

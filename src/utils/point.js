@@ -14,3 +14,11 @@ export const sortPointUpDate = (pointA, pointB) => {
   }
   return dayjs(pointB.startDate).diff(dayjs(pointA.startDate));
 };
+
+export const isDatesEqual = (dateA, dateB) => {
+  return (dateA === null && dateB === null) ? true : dayjs(dateA).isSame(dateB, 'D');
+};
+
+export const isPointExpired = (date) => {
+  return date === null ? false : dayjs().isAfter(date, 'D');
+};

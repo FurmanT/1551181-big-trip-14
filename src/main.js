@@ -1,18 +1,26 @@
 import SiteMenuView from './view/site-menu.js';
 import NewEventButtonView from './view/new-event-button.js';
 import {render, RenderPosition} from './utils/render.js';
-import FilterView from './view/filter.js';
 import {generatePoint} from './mock/point';
 import Trip from './presenter/trip';
 import TripHeader from './presenter/trip-header';
+import PointsModel from './model/points.js';
+import FilterModel from './model/filter.js';
+import FilterPresenter from './presenter/filter.js';
 
-const POINT_COUNT = 1;
+const POINT_COUNT = 40;
 const points = Array(POINT_COUNT).fill().map(generatePoint);
+const pointsModel = new PointsModel();
+pointsModel.setPoints(points);
+
+const filterModel = new FilterModel();
+
 const siteHeaderElement = document.querySelector('.page-header');
 const tripMainElement = siteHeaderElement.querySelector('.trip-main');
 
-const tripHeader = new TripHeader(tripMainElement);
-tripHeader.init(points);
+
+const tripHeader = new TripHeader(tripMainElement, pointsModel);
+tripHeader.init();
 
 const tripControlElements = tripMainElement.querySelector('.trip-controls');
 const siteMenuElement = tripControlElements.querySelector('.trip-controls__navigation');
@@ -22,7 +30,12 @@ const tripEventsElement = siteMainElement.querySelector('.trip-events');
 
 render(siteMenuElement, new SiteMenuView(), RenderPosition.BEFOREEND);
 render(tripMainElement, new NewEventButtonView(), RenderPosition.BEFOREEND);
-render(siteFilterElement, new FilterView(),RenderPosition.BEFOREEND);
+const filterPresenter = new FilterPresenter(siteFilterElement, filterModel, pointsModel);
+filterPresenter.init();
+const tripPresenter = new Trip(tripEventsElement, pointsModel, filterModel);
+tripPresenter.init();
 
-const tripPresenter = new Trip(tripEventsElement);
-tripPresenter.init(points);
+document.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
+  evt.preventDefault();
+  tripPresenter.createPoint();
+});
