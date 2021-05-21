@@ -119,7 +119,7 @@ export default class Trip {
   }
 
   _renderPointList() {
-    render(this._tripContainer,  this._pointListComponent, RenderPosition.BEFOREEND);
+    render(this._tripContainer, this._pointListComponent, RenderPosition.BEFOREEND);
   }
 
   _renderNoPoints() {
