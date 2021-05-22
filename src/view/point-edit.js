@@ -153,6 +153,7 @@ export default class PointEdit extends SmartView {
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
     this._setInnerHandlers();
     this._setDatepicker();
+
   }
 
   _startDateChangeHandler([userDate]) {
@@ -183,7 +184,7 @@ export default class PointEdit extends SmartView {
       {
         enableTime: true,
         dateFormat: 'd/m/Y H:i',
-        defaultDate: dayjs(this._state.startDate).toDate(),
+        defaultDate: (this._state.startDate) ? dayjs(this._state.startDate).toDate() : '',
         onChange: this._startDateChangeHandler,
       },
     );
@@ -193,7 +194,7 @@ export default class PointEdit extends SmartView {
       {
         enableTime: true,
         dateFormat: 'd/m/Y H:i',
-        defaultDate: dayjs(this._state.endDate).toDate(),
+        defaultDate: (this._state.endDate) ? dayjs(this._state.endDate).toDate() : '',
         onChange: this._endDateChangeHandler,
       },
     );
