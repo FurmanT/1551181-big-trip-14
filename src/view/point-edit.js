@@ -56,9 +56,8 @@ const createCityTemplate = (current) => {
           </datalist>`;
 };
 
-const createPointEditTemplate = (point) => {
-  const {type, destination, startDate, endDate, price, options, isOption} = point;
-  const optionType = getOptionsByType(type);
+const createPointEditTemplate = (point, optionsType) => {
+  const {type, destination, startDate, endDate, price, options } = point;
   const dateTo =  endDate ? dayjs(endDate).format('DD/MM/YY HH:mm') : '';
   const dateFrom = startDate ? dayjs(startDate).format('DD/MM/YY HH:mm') : '';
   return `<li class="trip-events__item">
@@ -111,13 +110,12 @@ const createPointEditTemplate = (point) => {
     </header>
     <section class="event__details">
 
-    ${isOption ?
-    `<section class="event__section  event__section--offers">
+    <section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
         <div class="event__available-offers">
-          ${createPointEditOptionsTemplate(options, optionType)}
+        ${(optionsType.length !== 0) ? createPointEditOptionsTemplate(options, optionsType)  : ''}
         </div>
-      </section>` : ''}
+      </section>
 
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
@@ -137,11 +135,13 @@ const createPointEditTemplate = (point) => {
 };
 
 export default class PointEdit extends SmartView {
-  constructor(point = BLANK_POINT) {
+  constructor(point = BLANK_POINT, offersModel) {
     super();
     this._state = PointEdit.parsePointToState(point);
     this._datepickerFrom = null;
     this._datepickerTo = null;
+    this._offersModel = offersModel;
+    this._offers = offersModel.getOffers(this._state.type);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteHandler = this._formDeleteHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
@@ -153,7 +153,6 @@ export default class PointEdit extends SmartView {
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
     this._setInnerHandlers();
     this._setDatepicker();
-
   }
 
   _startDateChangeHandler([userDate]) {
@@ -210,11 +209,7 @@ export default class PointEdit extends SmartView {
   static parsePointToState(point) {
     return Object.assign(
       {},
-      point,
-      {
-        isOption: point.options.length !== 0,
-      },
-    );
+      point);
   }
 
   static parseStateToPoint(state) {
@@ -310,7 +305,7 @@ export default class PointEdit extends SmartView {
   }
 
   getTemplate() {
-    return createPointEditTemplate(this._state);
+    return createPointEditTemplate(this._state,this._offers);
   }
 
   _formSubmitHandler(evt) {
@@ -327,7 +322,6 @@ export default class PointEdit extends SmartView {
     evt.preventDefault();
     this._callback.deleteClick(PointEdit.parseStateToPoint(this._state));
   }
-
 
   setDeleteClickHandler(callback) {
     this._callback.deleteClick = callback;

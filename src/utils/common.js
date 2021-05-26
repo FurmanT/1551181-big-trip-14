@@ -15,14 +15,33 @@ export const getDuration = (start, end) => {
   const min = end.diff(start, 'minute');
   const day = end.diff(start, 'day');
   const dateTime = dayjs.duration(end.diff(start));
-  if (min < 60) {
-    return `${min}M` ;
+
+  if  (day >= 1 ) {
+    return `${day}D ${dateTime.hours('HH')}H ${dateTime.minutes()}M`;
   }
   if (day < 1 ) {
     return `${dateTime.hours()}H ${dateTime.minutes()}M`;
   }
+  if (min < 60) {
+    return `${min}M` ;
+  }
+
+  return '';
+};
+
+export const getDurationbyMilisec = (milisec) => {
+  const dateObject = dayjs.duration(milisec);
+  const day = dateObject.days();
+  const min = dateObject.minutes();
+
   if  (day >= 1 ) {
-    return `${day}D ${dateTime.hours('HH')}H ${dateTime.minutes()}M`;
+    return `${day} D ${dateObject.hours('HH')}H ${min}M`;
+  }
+  if (day < 1 ) {
+    return `${dateObject.hours()}H ${dateObject.minutes()}M`;
+  }
+  if (min < 60) {
+    return `${min}M` ;
   }
   return '';
 };

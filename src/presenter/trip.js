@@ -9,9 +9,10 @@ import {filter} from '../utils/filters.js';
 import PointNewPresenter from './point-new';
 
 export default class Trip {
-  constructor(tripContainer, pointsModel, filterModel) {
+  constructor(tripContainer, pointsModel, filterModel, offersModel) {
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
+    this._offersModel = offersModel;
     this._tripContainer = tripContainer;
     this._sortComponent = null;
     this._pointListComponent = new ContainerListView();
@@ -22,42 +23,14 @@ export default class Trip {
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._currentSortType = SortType.DAY;
-    this._pointsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
-    this._pointNewPresenter = new PointNewPresenter(this._pointListComponent, this._handleViewAction);
+    this._pointNewPresenter = new PointNewPresenter(this._pointListComponent, this._handleViewAction, this._offersModel);
   }
 
   init() {
+    this._pointsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+    this._offersModel.addObserver(this._handleModelEvent);
     this._renderTrip();
-  }
-
-  _getPoints() {
-    const filterType = this._filterModel.getFilter();
-    const points = this._pointsModel.getPoints();
-    const filtredPoints = filter[filterType](points);
-
-    switch (this._currentSortType) {
-      case SortType.PRICE:
-        return filtredPoints.sort(sortPointUpPrice);
-      case SortType.TIME:
-        return filtredPoints.sort(sortPointUpTime);
-      case SortType.DAY:
-        return filtredPoints.sort(sortPointUpDate);
-    }
-    return filtredPoints;
-
-  }
-
-  createPoint() {
-    this._currentSortType = SortType.DAY;
-    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this._pointNewPresenter.init();
-  }
-
-  _handleModeChange() {
-    Object
-      .values(this._pointPresenter)
-      .forEach((presenter) => presenter.resetView());
   }
 
   _handleViewAction(actionType, updateType, update) {
@@ -90,6 +63,60 @@ export default class Trip {
     }
   }
 
+  hideTrip() {
+    this._tripContainer.classList.add('trip-events--hidden');
+  }
+
+  showTrip(){
+    this._tripContainer.classList.remove('trip-events--hidden');
+  }
+
+  destroy() {
+    this._clearTrip({resetSortType: true});
+    remove(this._pointListComponent);
+    remove(this._tripContainer);
+    this._pointsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
+    this._offersModel.removeObserver(this._handleModelEvent);
+  }
+
+  _getPoints() {
+    const filterType = this._filterModel.getFilter();
+    const points = this._pointsModel.getPoints();
+    const filtredPoints = filter[filterType](points);
+
+    switch (this._currentSortType) {
+      case SortType.PRICE:
+        return filtredPoints.sort(sortPointUpPrice);
+      case SortType.TIME:
+        return filtredPoints.sort(sortPointUpTime);
+      case SortType.DAY:
+        return filtredPoints.sort(sortPointUpDate);
+    }
+    return filtredPoints;
+  }
+
+  createPoint() {
+    this._currentSortType = SortType.DAY;
+    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this._pointNewPresenter.init(this._offersModel);
+  }
+
+  _handleModeChange() {
+    Object
+      .values(this._pointPresenter)
+      .forEach((presenter) => presenter.resetView());
+  }
+
+  checkSortType() {
+    if (this._currentSortType === SortType.DAY) {
+      return;
+    }
+    this._currentSortType = SortType.DAY;
+    this._clearTrip();
+    this._renderTrip();
+  }
+
   _handleSortTypeChange(sortType) {
     if (this._currentSortType === sortType) {
       return;
@@ -109,7 +136,7 @@ export default class Trip {
   }
 
   _renderPoint(point) {
-    const pointPresenter = new PointPresenter(this._pointListComponent, this._handleViewAction, this._handleModeChange);
+    const pointPresenter = new PointPresenter(this._pointListComponent, this._handleViewAction, this._handleModeChange, this._offersModel);
     pointPresenter.init(point);
     this._pointPresenter[point.id] = pointPresenter;
   }
