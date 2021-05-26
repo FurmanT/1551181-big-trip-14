@@ -7,8 +7,10 @@ import TripHeader from './presenter/trip-header';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
+import DestinationsModel from './model/destinations.js';
 import FilterPresenter from './presenter/filter.js';
-import {MenuItem, OPTIONS} from './const';
+import {MenuItem, OPTIONS, DESTINATIONS} from './const';
+
 
 const POINT_COUNT = 2;
 const points = Array(POINT_COUNT).fill().map(generatePoint);
@@ -17,6 +19,11 @@ pointsModel.setPoints(points);
 
 const offersModel = new OffersModel();
 setTimeout(() => offersModel.setOffers(OPTIONS), 10000);
+
+const destinationsModel = new DestinationsModel();
+destinationsModel.setDestinations(DESTINATIONS);
+
+//setTimeout(() => destinationsModel.setDestinations(DESTINATIONS), 15000);
 
 const filterModel = new FilterModel();
 
@@ -36,7 +43,7 @@ siteMenuComponent.setMenuItem(MenuItem.TABLE);
 
 const filterPresenter = new FilterPresenter(siteFilterElement, filterModel, pointsModel);
 filterPresenter.init();
-const tripPresenter = new Trip(tripEventsElement, pointsModel, filterModel, offersModel);
+const tripPresenter = new Trip(tripEventsElement, pointsModel, filterModel, offersModel, destinationsModel);
 tripPresenter.init();
 
 const tripHeader = new TripHeader(tripMainElement, pointsModel, () => tripPresenter.createPoint());

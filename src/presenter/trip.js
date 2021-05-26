@@ -9,10 +9,11 @@ import {filter} from '../utils/filters.js';
 import PointNewPresenter from './point-new';
 
 export default class Trip {
-  constructor(tripContainer, pointsModel, filterModel, offersModel) {
+  constructor(tripContainer, pointsModel, filterModel, offersModel, destinationsModel) {
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
     this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
     this._tripContainer = tripContainer;
     this._sortComponent = null;
     this._pointListComponent = new ContainerListView();
@@ -97,7 +98,7 @@ export default class Trip {
   createPoint() {
     this._currentSortType = SortType.DAY;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this._pointNewPresenter.init(this._offersModel);
+    this._pointNewPresenter.init(this._offersModel, this._destinationsModel);
   }
 
   _handleModeChange() {
@@ -134,7 +135,7 @@ export default class Trip {
   }
 
   _renderPoint(point) {
-    const pointPresenter = new PointPresenter(this._pointListComponent, this._handleViewAction, this._handleModeChange, this._offersModel);
+    const pointPresenter = new PointPresenter(this._pointListComponent, this._handleViewAction, this._handleModeChange, this._offersModel, this._destinationsModel);
     pointPresenter.init(point);
     this._pointPresenter[point.id] = pointPresenter;
   }

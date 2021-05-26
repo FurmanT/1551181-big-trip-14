@@ -39,7 +39,4 @@ export default class TripHeader {
     this._newEventComponent.getElement();
   }
 
-  test() {
-    this._newEventComponent.method();
-  }
 }

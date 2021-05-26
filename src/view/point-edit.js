@@ -1,7 +1,6 @@
-import {DESTINATIONS, TYPES , BLANK_POINT } from '../const';
+import {TYPES, BLANK_POINT} from '../const';
 import SmartView from './smart.js';
 import dayjs from 'dayjs';
-import {getOptionsByType} from '../mock/options';
 import flatpickr from 'flatpickr';
 import he from 'he';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
@@ -9,9 +8,8 @@ import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 const createPointEditOptionsTemplate = (selectedOptions, typeOptions) => {
   return typeOptions.map((option) => {
     const name = option.title.toLowerCase().replace(/\s/g, '-');
-
-    const isChecked = (selectedOptions.findIndex((item) => (
-      item.title === option.title))) === -1 ? '' : 'checked';
+    const isChecked = (selectedOptions) ? ((selectedOptions.findIndex((item) => (
+      item.title === option.title))) === -1 ? '' : 'checked') : ('');
 
     return `<div class="event__offer-selector">
      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox"
@@ -33,17 +31,20 @@ const createEventTypeTemplate = (current) => {
     </div>`).join('');
 };
 
-const createCityTemplate = (current) => {
+const createDestinationTemplate = (current, destinations) => {
   return `<input class="event__input  event__input--destination" id="event-destination-1" type="text"
            name="event-destination" value="${current}" list="destination-list-1">
-          <datalist id="destination-list-1">
-            ${DESTINATIONS.map((destination) => {
-    return `<option value="${destination.name}"></option>`;
-  }).join('')}
-          </datalist>`;
+          ${ (destinations.length !== 0) ? (
+    `<datalist id="destination-list-1">
+                  ${destinations.map((destination) => {
+      return `<option value="${destination.name}"></option>`;
+    }).join('')}
+               </datalist>`) : ''
+}
+`;
 };
 
-const createPointEditTemplate = (point, optionsType) => {
+const createPointEditTemplate = (point, optionsType, destinations) => {
   const {type, destination, startDate, endDate, price, options } = point;
   const dateTo =  endDate ? dayjs(endDate).format('DD/MM/YY HH:mm') : '';
   const dateFrom = startDate ? dayjs(startDate).format('DD/MM/YY HH:mm') : '';
@@ -68,7 +69,7 @@ const createPointEditTemplate = (point, optionsType) => {
         <label class="event__label  event__type-output" for="event-destination-1">
           ${type ? type : ''}
         </label>
-          ${createCityTemplate(destination.name)}
+          ${createDestinationTemplate(destination.name, destinations )}
       </div>
 
       <div class="event__field-group  event__field-group--time">
@@ -122,19 +123,21 @@ const createPointEditTemplate = (point, optionsType) => {
 };
 
 export default class PointEdit extends SmartView {
-  constructor(point = BLANK_POINT, offersModel) {
+  constructor(point = BLANK_POINT, offersModel, destinationsModel) {
     super();
     this._state = PointEdit.parsePointToState(point);
     this._datepickerFrom = null;
     this._datepickerTo = null;
+    this._offersModel = offersModel;
     this._offers = offersModel.getOffers(this._state.type);
+    this._destinations = destinationsModel.getDestinations();
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteHandler = this._formDeleteHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._destinationClickHandler = this._destinationClickHandler.bind(this);
     this._typeClickHandler = this._typeClickHandler.bind(this);
     this._priceClickHandler = this._priceClickHandler.bind(this);
-    this._optionChangeHandler = this._optionChangeHandler.bind(this);
+    this._offersChangeHandler = this._offersChangeHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
     this._setInnerHandlers();
@@ -204,6 +207,7 @@ export default class PointEdit extends SmartView {
   }
 
   restoreHandlers() {
+    this._offers = this._offersModel.getOffers(this._state.type);
     this._setInnerHandlers();
     this._setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
@@ -221,24 +225,22 @@ export default class PointEdit extends SmartView {
     this.getElement()
       .querySelector('.event__input--price')
       .addEventListener('change', this._priceClickHandler);
-    if (this._state.isOption) {
-      this.getElement()
-        .querySelector('.event__available-offers')
-        .addEventListener('click', this._optionChangeHandler);
-    }
+    this.getElement()
+      .querySelector('.event__available-offers')
+      .addEventListener('click', this._offersChangeHandler);
   }
 
-  _optionChangeHandler(evt) {
+  _offersChangeHandler(evt) {
     if (evt.target.tagName !== 'LABEL') {
       return;
     }
     evt.preventDefault();
-    this.optionType = getOptionsByType(this._state.type);
+    this.optionType = this._offersModel.getOffers(this._state.type);
     const selectTitleOption = evt.target.firstElementChild.outerText;
     const selectOption = this.optionType.filter((element) => {
       return element.title === selectTitleOption;
     });
-    const cloneOptionsState = []; // новый пустой объект
+    const cloneOptionsState = [];
     const options = Object.assign({}, this._state.options);
     for (const key in options) {
       cloneOptionsState[key] = Object.assign({}, options[key]);
@@ -262,7 +264,7 @@ export default class PointEdit extends SmartView {
 
   _destinationClickHandler(evt) {
     evt.preventDefault();
-    const selectedDestination = DESTINATIONS.find((destination) => destination.name === evt.target.value);
+    const selectedDestination = this._destinations.find((destination) => destination.name === evt.target.value);
     if (!selectedDestination) {
       evt.target.setCustomValidity('Выберите город из списка');
       return;
@@ -291,7 +293,7 @@ export default class PointEdit extends SmartView {
   }
 
   getTemplate() {
-    return createPointEditTemplate(this._state, this._offers);
+    return createPointEditTemplate(this._state, this._offers, this._destinations);
   }
 
   _formSubmitHandler(evt) {

@@ -15,22 +15,27 @@ export default class PointNew {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._offersModel = null;
+    this._destinationsModel = null;
   }
 
   _handleModelEvent() {
     this.destroy();
-    this.init(this._offersModel);
+    this.init(this._offersModel, this._destinationsModel);
   }
 
-  init(offersModel) {
+  init(offersModel, destinationsModel) {
     if (this._offersModel === null) {
       this._offersModel = offersModel;
       this._offersModel.addObserver(this._handleModelEvent);
     }
+    if (this._destinationsModel === null) {
+      this._destinationsModel = destinationsModel;
+      this._destinationsModel.addObserver(this._handleModelEvent);
+    }
     if (this._pointEditComponent !== null) {
       return;
     }
-    this._pointEditComponent = new PointEditView(BLANK_POINT, this._offersModel);
+    this._pointEditComponent = new PointEditView(BLANK_POINT, this._offersModel, this._destinationsModel);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
     this._pointEditComponent.setCloseClickHandler(this._handleCloseClick);
