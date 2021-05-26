@@ -11,33 +11,27 @@ import DestinationsModel from './model/destinations.js';
 import FilterPresenter from './presenter/filter.js';
 import {MenuItem, OPTIONS, DESTINATIONS} from './const';
 
-
-const POINT_COUNT = 2;
-const points = Array(POINT_COUNT).fill().map(generatePoint);
-const pointsModel = new PointsModel();
-pointsModel.setPoints(points);
-
-const offersModel = new OffersModel();
-setTimeout(() => offersModel.setOffers(OPTIONS), 10000);
-
-const destinationsModel = new DestinationsModel();
-destinationsModel.setDestinations(DESTINATIONS);
-
-//setTimeout(() => destinationsModel.setDestinations(DESTINATIONS), 15000);
-
-const filterModel = new FilterModel();
-
+const POINT_COUNT = 40;
 const siteHeaderElement = document.querySelector('.page-header');
 const tripMainElement = siteHeaderElement.querySelector('.trip-main');
 const tripControlElements = tripMainElement.querySelector('.trip-controls');
 const siteMenuElement = tripControlElements.querySelector('.trip-controls__navigation');
 const siteFilterElement = tripControlElements.querySelector('.trip-controls__filters');
-
-const siteMenuComponent = new SiteMenuView();
 const siteMainElement = document.querySelector('.page-main');
 const pageBodyContainer = siteMainElement.querySelector('.page-body__container');
 const tripEventsElement = siteMainElement.querySelector('.trip-events');
 
+const points = Array(POINT_COUNT).fill().map(generatePoint);
+const pointsModel = new PointsModel();
+pointsModel.setPoints(points);
+
+const offersModel = new OffersModel();
+offersModel.setOffers(OPTIONS);
+const destinationsModel = new DestinationsModel();
+destinationsModel.setDestinations(DESTINATIONS);
+const filterModel = new FilterModel();
+
+const siteMenuComponent = new SiteMenuView();
 render(siteMenuElement, siteMenuComponent, RenderPosition.BEFOREEND);
 siteMenuComponent.setMenuItem(MenuItem.TABLE);
 
@@ -45,7 +39,6 @@ const filterPresenter = new FilterPresenter(siteFilterElement, filterModel, poin
 filterPresenter.init();
 const tripPresenter = new Trip(tripEventsElement, pointsModel, filterModel, offersModel, destinationsModel);
 tripPresenter.init();
-
 const tripHeader = new TripHeader(tripMainElement, pointsModel, () => tripPresenter.createPoint());
 tripHeader.init();
 const statisticsComponent = new StatisticsView(pointsModel.getPoints());
