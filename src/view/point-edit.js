@@ -1,23 +1,10 @@
-import {DESTINATIONS, TYPES } from '../const';
+import {DESTINATIONS, TYPES , BLANK_POINT } from '../const';
 import SmartView from './smart.js';
 import dayjs from 'dayjs';
 import {getOptionsByType} from '../mock/options';
 import flatpickr from 'flatpickr';
 import he from 'he';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
-
-const BLANK_POINT = {
-  type: TYPES[0],
-  options: [],
-  destination: {
-    name: '',
-    description: [],
-    photo: [],
-  },
-  startDate: '',
-  endDate: '',
-  price: 0,
-};
 
 const createPointEditOptionsTemplate = (selectedOptions, typeOptions) => {
   return typeOptions.map((option) => {
@@ -140,7 +127,6 @@ export default class PointEdit extends SmartView {
     this._state = PointEdit.parsePointToState(point);
     this._datepickerFrom = null;
     this._datepickerTo = null;
-    this._offersModel = offersModel;
     this._offers = offersModel.getOffers(this._state.type);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteHandler = this._formDeleteHandler.bind(this);
@@ -305,7 +291,7 @@ export default class PointEdit extends SmartView {
   }
 
   getTemplate() {
-    return createPointEditTemplate(this._state,this._offers);
+    return createPointEditTemplate(this._state, this._offers);
   }
 
   _formSubmitHandler(evt) {

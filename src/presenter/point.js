@@ -24,6 +24,12 @@ export default class Point {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
+    this.handleEventModel = this.handleEventModel.bind(this);
+    this._offersModel.addObserver(this.handleEventModel);
+  }
+
+  handleEventModel() {
+    this.init(this._point);
   }
 
   init(point) {

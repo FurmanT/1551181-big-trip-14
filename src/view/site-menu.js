@@ -13,7 +13,6 @@ export default class SiteMenu extends AbstractView {
   constructor() {
     super();
     this._menuClickHandler = this._menuClickHandler.bind(this);
-    console.log(' i SiteMenu');
   }
 
   getTemplate() {

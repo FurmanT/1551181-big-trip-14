@@ -195,3 +195,16 @@ export const MenuItem = {
   TABLE: 'Table',
   STATS: 'Stats',
 };
+
+export const BLANK_POINT = {
+  type: TYPES[0],
+  options: [],
+  destination: {
+    name: '',
+    description: [],
+    photo: [],
+  },
+  startDate: '',
+  endDate: '',
+  price: 0,
+};

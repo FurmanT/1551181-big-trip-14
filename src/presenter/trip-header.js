@@ -38,4 +38,8 @@ export default class TripHeader {
   getElementButton() {
     this._newEventComponent.getElement();
   }
+
+  test() {
+    this._newEventComponent.method();
+  }
 }

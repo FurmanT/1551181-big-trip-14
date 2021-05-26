@@ -15,6 +15,7 @@ export default class NewEventButton extends AbstractView {
   }
 
   _clickHandler(evt) {
+    evt.target.disabled = true;
     evt.preventDefault();
     this._callback.click();
   }
@@ -23,7 +24,9 @@ export default class NewEventButton extends AbstractView {
     this._callback.click = callback;
     this.getElement()
       .addEventListener('click', this._clickHandler);
-    this.getElement().disable = true;
   }
 
+  method(){
+    this.getElement().disabled = false;
+  }
 }

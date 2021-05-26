@@ -7,7 +7,7 @@ export const generateTripInfo = (points) => {
 
 
   const price = points.reduce((sum , point) => {
-    return sum  + point.price;
+    return sum  + Number(point.price);
   }, 0);
 
   const date =  dayjs(points[0].startDate).format('DD MMM') +'-' +  dayjs(points[points.length - 1].endDate).format('DD MMM');

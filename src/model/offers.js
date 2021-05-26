@@ -1,5 +1,4 @@
 import Observer from '../utils/observer.js';
-import {UpdateType} from '../const';
 
 export default class Offers extends Observer {
   constructor() {
@@ -9,7 +8,7 @@ export default class Offers extends Observer {
 
   setOffers(offers) {
     this._offers = offers.slice();
-    this._notify(UpdateType.MINOR, this._offers);
+    this._notify(this._offers);
   }
 
   getOffers(type){
