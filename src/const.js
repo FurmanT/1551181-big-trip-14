@@ -150,6 +150,7 @@ export const OPTIONS =[
       },
     ],
   },
+
 ];
 
 export const TYPES = ['taxi', 'bus', 'train', 'ship', 'transport', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
@@ -189,4 +190,22 @@ export const FilterType = {
   EVERYTHING: 'Everything',
   FUTURE: 'Future',
   PAST: 'Past',
+};
+
+export const MenuItem = {
+  TABLE: 'Table',
+  STATS: 'Stats',
+};
+
+export const BLANK_POINT = {
+  type: TYPES[0],
+  options: [],
+  destination: {
+    name: '',
+    description: [],
+    photo: [],
+  },
+  startDate: '',
+  endDate: '',
+  price: 0,
 };
