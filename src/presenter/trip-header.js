@@ -19,11 +19,14 @@ export default class TripHeader {
   }
 
   init() {
+    const prevComponent = this._tripMainInfoComponent;
     this._tripInfo = generateTripInfo(this._pointsModel.getPoints());
-    if (!this._tripInfo){
+    if (Object.keys(this._tripInfo).length === 0){
+      if (prevComponent !== null) {
+        remove(prevComponent);
+      }
       return;
     }
-    const prevComponent = this._tripMainInfoComponent;
     this._tripMainInfoComponent = new MainTripInfoView(this._tripInfo);
     if (prevComponent === null) {
       render(this._container, this._tripMainInfoComponent, RenderPosition.AFTERBEGIN);
@@ -35,8 +38,8 @@ export default class TripHeader {
     remove(prevComponent);
   }
 
-  getElementButton() {
-    this._newEventComponent.getElement();
+  enableNewEventButton() {
+    this._newEventComponent.enableButton();
   }
 
 }

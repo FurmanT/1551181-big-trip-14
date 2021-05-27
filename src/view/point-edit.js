@@ -8,9 +8,8 @@ import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 const createPointEditOptionsTemplate = (selectedOptions, typeOptions) => {
   return typeOptions.map((option) => {
     const name = option.title.toLowerCase().replace(/\s/g, '-');
-    const isChecked = (selectedOptions) ? ((selectedOptions.findIndex((item) => (
+    const isChecked = (selectedOptions.length !== 0) ? ((selectedOptions.findIndex((item) => (
       item.title === option.title))) === -1 ? '' : 'checked') : ('');
-
     return `<div class="event__offer-selector">
      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox"
            name="event-offer-${name}" ${isChecked}>
@@ -129,7 +128,6 @@ export default class PointEdit extends SmartView {
     this._datepickerFrom = null;
     this._datepickerTo = null;
     this._offersModel = offersModel;
-    this._offers = offersModel.getOffers(this._state.type);
     this._destinations = destinationsModel.getDestinations();
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteHandler = this._formDeleteHandler.bind(this);
@@ -207,7 +205,6 @@ export default class PointEdit extends SmartView {
   }
 
   restoreHandlers() {
-    this._offers = this._offersModel.getOffers(this._state.type);
     this._setInnerHandlers();
     this._setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
@@ -293,7 +290,7 @@ export default class PointEdit extends SmartView {
   }
 
   getTemplate() {
-    return createPointEditTemplate(this._state, this._offers, this._destinations);
+    return createPointEditTemplate(this._state, this._offersModel.getOffers(this._state.type), this._destinations);
   }
 
   _formSubmitHandler(evt) {

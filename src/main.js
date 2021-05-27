@@ -3,7 +3,6 @@ import StatisticsView from './view/statistics.js';
 import {render, RenderPosition} from './utils/render.js';
 import {generatePoint} from './mock/point';
 import Trip from './presenter/trip';
-import TripHeader from './presenter/trip-header';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
@@ -27,8 +26,10 @@ pointsModel.setPoints(points);
 
 const offersModel = new OffersModel();
 offersModel.setOffers(OPTIONS);
+
 const destinationsModel = new DestinationsModel();
 destinationsModel.setDestinations(DESTINATIONS);
+
 const filterModel = new FilterModel();
 
 const siteMenuComponent = new SiteMenuView();
@@ -37,10 +38,8 @@ siteMenuComponent.setMenuItem(MenuItem.TABLE);
 
 const filterPresenter = new FilterPresenter(siteFilterElement, filterModel, pointsModel);
 filterPresenter.init();
-const tripPresenter = new Trip(tripEventsElement, pointsModel, filterModel, offersModel, destinationsModel);
+const tripPresenter = new Trip(tripEventsElement, tripMainElement, pointsModel, filterModel, offersModel, destinationsModel);
 tripPresenter.init();
-const tripHeader = new TripHeader(tripMainElement, pointsModel, () => tripPresenter.createPoint());
-tripHeader.init();
 const statisticsComponent = new StatisticsView(pointsModel.getPoints());
 
 const handleSiteMenuClick = (menuItem) => {
