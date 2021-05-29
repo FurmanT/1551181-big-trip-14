@@ -1,7 +1,8 @@
 import {remove, render, RenderPosition, replace} from '../utils/render';
-import {generateTripInfo} from '../mock/trip-info';
+import {generateTripInfo} from '../utils/point';
 import MainTripInfoView from '../view/trip-info-main.js';
 import NewEventButtonView from '../view/new-event-button';
+
 
 export default class TripHeader {
   constructor(container, pointsModel, callbackAddEvent) {
@@ -25,6 +26,9 @@ export default class TripHeader {
       if (prevComponent !== null) {
         remove(prevComponent);
       }
+
+      render(this._container, this._newEventComponent, RenderPosition.BEFOREEND);
+      this._newEventComponent.setClickHandler(this._callbackAddEvent);
       return;
     }
     this._tripMainInfoComponent = new MainTripInfoView(this._tripInfo);
