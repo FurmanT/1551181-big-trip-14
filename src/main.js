@@ -1,7 +1,6 @@
 import SiteMenuView from './view/site-menu.js';
 import StatisticsView from './view/statistics.js';
 import {render, RenderPosition} from './utils/render.js';
-// import {generatePoint} from './mock/point';
 import Trip from './presenter/trip';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
@@ -54,32 +53,36 @@ const handleSiteMenuClick = (menuItem) => {
 render(pageBodyContainer, statisticsComponent, RenderPosition.BEFOREEND);
 statisticsComponent.hide();
 
+
 api.getDestinations()
   .then((destinations) => {
     destinationsModel.setDestinations(destinations);
   })
-  .then(()=>
-    api.getOffers()
-      .then((offers) => {
-        offersModel.setOffers(offers);
-      }),
-  )
-  .then(() => {
-    api.getPoints()
-      .then((points) => {
-        pointsModel.setPoints(UpdateType.INIT, points);
-        render(siteMenuElement, siteMenuComponent, RenderPosition.BEFOREEND);
-        siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-        filterPresenter.init();
-      })
-      .catch(() => {
-        pointsModel.setPoints(UpdateType.INIT, []);
-        render(siteMenuElement, siteMenuComponent, RenderPosition.BEFOREEND);
-        siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-        filterPresenter.init();
-      });
+  .catch(() => {
+    alert('Произошла ошибка загрузку...');
+  });
+
+api.getOffers()
+  .then((offers) => {
+    offersModel.setOffers(offers);
   })
   .catch(() => {
-
+    alert('Произошла ошибка загрузку...');
   });
+
+
+api.getPoints()
+  .then((points) => {
+    pointsModel.setPoints(UpdateType.INIT, points);
+    render(siteMenuElement, siteMenuComponent, RenderPosition.BEFOREEND);
+    siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+    filterPresenter.init();
+  })
+  .catch(() => {
+    pointsModel.setPoints(UpdateType.INIT, []);
+    render(siteMenuElement, siteMenuComponent, RenderPosition.BEFOREEND);
+    siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+    filterPresenter.init();
+  });
+
 

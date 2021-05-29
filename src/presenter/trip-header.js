@@ -1,5 +1,5 @@
 import {remove, render, RenderPosition, replace} from '../utils/render';
-import {generateTripInfo} from '../mock/trip-info';
+import {generateTripInfo} from '../utils/point';
 import MainTripInfoView from '../view/trip-info-main.js';
 import NewEventButtonView from '../view/new-event-button';
 
