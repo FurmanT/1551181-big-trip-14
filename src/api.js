@@ -27,6 +27,11 @@ export default class Api {
       .then(Api.toJSON);
   }
 
+  getOffers() {
+    return this._load({url: 'offers'})
+      .then(Api.toJSON);
+  }
+
   updatePoint(point) {
     return this._load({
       url: `point/${point.id}`,
