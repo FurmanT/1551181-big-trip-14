@@ -8,9 +8,11 @@ import {sortPointUpPrice, sortPointUpTime, sortPointUpDate} from '../utils/point
 import {filter} from '../utils/filters.js';
 import PointNewPresenter from './point-new';
 import TripHeader from './trip-header';
+import LoadingView from '../view/loading.js';
+import ErrorView from '../view/error.js';
 
 export default class Trip {
-  constructor(tripContainer, tripHeaderContainer, pointsModel, filterModel, offersModel, destinationsModel) {
+  constructor(tripContainer, tripHeaderContainer, pointsModel, filterModel, offersModel, destinationsModel, api) {
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
     this._offersModel = offersModel;
@@ -21,17 +23,22 @@ export default class Trip {
     this._pointListComponent = new ContainerListView();
     this._noPointsComponent = new NoPoints();
     this._pointPresenter = {};
+    this._currentSortType = SortType.DAY;
+    this._headerPresenter = new TripHeader(tripHeaderContainer, pointsModel, () => this.createPoint());
+    this._isLoading = true;
+    this._isError = false;
+    this._loadingComponent = new LoadingView();
+    this._errorComponent = new ErrorView();
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
-    this._currentSortType = SortType.DAY;
     this._pointNewPresenter = new PointNewPresenter(
       this._pointListComponent,
       this._handleViewAction,
       this._offersModel,
       this._destinationsModel);
-    this._headerPresenter = new TripHeader(tripHeaderContainer, pointsModel, () => this.createPoint());
+    this._api = api;
   }
 
   init() {
@@ -44,7 +51,9 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this._pointsModel.updatePoint(updateType, update);
+        this._api.updatePoint(update).then((response) => {
+          this._pointsModel.updatePoint(updateType, response);
+        });
         break;
       case UserAction.ADD_POINT:
         this._pointsModel.addPoint(updateType, update);
@@ -65,8 +74,12 @@ export default class Trip {
         this._renderTrip();
         break;
       case UpdateType.MAJOR:
-        console.log('UpdateType.MAJOR');
         this._clearTrip({resetSortType: true});
+        this._renderTrip();
+        break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
         this._renderTrip();
         break;
     }
@@ -106,6 +119,7 @@ export default class Trip {
   }
 
   createPoint() {
+    remove(this._noPointsComponent);
     this._currentSortType = SortType.DAY;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._pointNewPresenter.init(() => this._headerPresenter.enableNewEventButton());
@@ -176,17 +190,30 @@ export default class Trip {
     }
   }
 
+  _renderLoading() {
+    render(this._tripContainer, this._loadingComponent, RenderPosition.AFTERBEGIN);
+  }
+
+  renderError() {
+    render(this._tripContainer, this._errorComponent , RenderPosition.AFTERBEGIN);
+  }
+
   _renderTrip() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
     const points = this._getPoints();
     const pointsCount = points.length;
 
     if (pointsCount === 0 ){
       this._renderNoPoints();
+      this._renderPointList();
+
       return;
     }
     this._renderSort();
     this._renderPointList();
     this._renderPoints(points);
   }
-
 }

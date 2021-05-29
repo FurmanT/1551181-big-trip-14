@@ -1,16 +1,19 @@
 import SiteMenuView from './view/site-menu.js';
 import StatisticsView from './view/statistics.js';
 import {render, RenderPosition} from './utils/render.js';
-import {generatePoint} from './mock/point';
+// import {generatePoint} from './mock/point';
 import Trip from './presenter/trip';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
 import DestinationsModel from './model/destinations.js';
 import FilterPresenter from './presenter/filter.js';
-import {MenuItem, OPTIONS, DESTINATIONS} from './const';
+import Api from './api.js';
+import { makeID } from './utils/common';
+import {MenuItem, UpdateType} from './const';
 
-const POINT_COUNT = 40;
+const AUTHORIZATION = `Basic ${makeID(12)}`;
+const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
 const siteHeaderElement = document.querySelector('.page-header');
 const tripMainElement = siteHeaderElement.querySelector('.trip-main');
 const tripControlElements = tripMainElement.querySelector('.trip-controls');
@@ -20,25 +23,17 @@ const siteMainElement = document.querySelector('.page-main');
 const pageBodyContainer = siteMainElement.querySelector('.page-body__container');
 const tripEventsElement = siteMainElement.querySelector('.trip-events');
 
-const points = Array(POINT_COUNT).fill().map(generatePoint);
+const api = new Api(END_POINT, AUTHORIZATION);
 const pointsModel = new PointsModel();
-pointsModel.setPoints(points);
 
 const offersModel = new OffersModel();
-offersModel.setOffers(OPTIONS);
-
 const destinationsModel = new DestinationsModel();
-destinationsModel.setDestinations(DESTINATIONS);
-
 const filterModel = new FilterModel();
-
 const siteMenuComponent = new SiteMenuView();
-render(siteMenuElement, siteMenuComponent, RenderPosition.BEFOREEND);
 siteMenuComponent.setMenuItem(MenuItem.TABLE);
 
 const filterPresenter = new FilterPresenter(siteFilterElement, filterModel, pointsModel);
-filterPresenter.init();
-const tripPresenter = new Trip(tripEventsElement, tripMainElement, pointsModel, filterModel, offersModel, destinationsModel);
+const tripPresenter = new Trip(tripEventsElement, tripMainElement, pointsModel, filterModel, offersModel, destinationsModel, api);
 tripPresenter.init();
 const statisticsComponent = new StatisticsView(pointsModel.getPoints());
 
@@ -56,6 +51,35 @@ const handleSiteMenuClick = (menuItem) => {
   }
 };
 
-siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 render(pageBodyContainer, statisticsComponent, RenderPosition.BEFOREEND);
 statisticsComponent.hide();
+
+api.getDestinations()
+  .then((destinations) => {
+    destinationsModel.setDestinations(destinations);
+  })
+  .then(()=>
+    api.getOffers()
+      .then((offers) => {
+        offersModel.setOffers(offers);
+      }),
+  )
+  .then(() => {
+    api.getPoints()
+      .then((points) => {
+        pointsModel.setPoints(UpdateType.INIT, points);
+        render(siteMenuElement, siteMenuComponent, RenderPosition.BEFOREEND);
+        siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+        filterPresenter.init();
+      })
+      .catch(() => {
+        pointsModel.setPoints(UpdateType.INIT, []);
+        render(siteMenuElement, siteMenuComponent, RenderPosition.BEFOREEND);
+        siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+        filterPresenter.init();
+      });
+  })
+  .catch(() => {
+
+  });
+
