@@ -7,12 +7,18 @@ import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
 import DestinationsModel from './model/destinations.js';
 import FilterPresenter from './presenter/filter.js';
-import Api from './api.js';
+import Api from './api/api.js';
 import { makeID } from './utils/common';
 import {MenuItem, UpdateType} from './const';
+import Store from './api/store.js';
+import Provider from './api/provider.js';
 
 const AUTHORIZATION = `Basic ${makeID(12)}`;
 const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
+const STORE_PREFIX = 'bigtrip-localstorage';
+const STORE_VER = 'v14';
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+
 const siteHeaderElement = document.querySelector('.page-header');
 const tripMainElement = siteHeaderElement.querySelector('.trip-main');
 const tripControlElements = tripMainElement.querySelector('.trip-controls');
@@ -23,8 +29,11 @@ const pageBodyContainer = siteMainElement.querySelector('.page-body__container')
 const tripEventsElement = siteMainElement.querySelector('.trip-events');
 
 const api = new Api(END_POINT, AUTHORIZATION);
-const pointsModel = new PointsModel();
 
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
+
+const pointsModel = new PointsModel();
 const offersModel = new OffersModel();
 const destinationsModel = new DestinationsModel();
 const filterModel = new FilterModel();
@@ -32,7 +41,7 @@ const siteMenuComponent = new SiteMenuView();
 siteMenuComponent.setMenuItem(MenuItem.TABLE);
 
 const filterPresenter = new FilterPresenter(siteFilterElement, filterModel, pointsModel);
-const tripPresenter = new Trip(tripEventsElement, tripMainElement, pointsModel, filterModel, offersModel, destinationsModel, api);
+const tripPresenter = new Trip(tripEventsElement, tripMainElement, pointsModel, filterModel, offersModel, destinationsModel, apiWithProvider);
 tripPresenter.init();
 const statisticsComponent = new StatisticsView(pointsModel.getPoints());
 
@@ -70,8 +79,7 @@ api.getOffers()
     alert('Произошла ошибка загрузку...');
   });
 
-
-api.getPoints()
+apiWithProvider.getPoints()
   .then((points) => {
     pointsModel.setPoints(UpdateType.INIT, points);
     render(siteMenuElement, siteMenuComponent, RenderPosition.BEFOREEND);
@@ -85,4 +93,16 @@ api.getPoints()
     filterPresenter.init();
   });
 
+window.addEventListener('load', () => {
+  navigator.serviceWorker.register('/sw.js');
+});
 
+window.addEventListener('online', () => {
+  document.title = document.title.replace(' [offline]', '');
+  apiWithProvider.sync();
+});
+
+window.addEventListener('offline', () => {
+
+  document.title += ' [offline]';
+});

@@ -3,6 +3,8 @@ import PointView from '../view/point';
 import PointEditView from '../view/point-edit';
 import {UserAction, UpdateType} from '../const.js';
 import { isDatesEqual } from '../utils/point.js';
+import {toast} from '../utils/toast.js';
+import {isOnline} from '../utils/common.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -69,6 +71,10 @@ export default class Point {
   }
 
   _replaceCardToForm() {
+    if (!isOnline()) {
+      toast('You can\'t edit point offline');
+      return;
+    }
     replace(this._pointEditComponent, this._pointComponent);
     document.addEventListener('keydown', this._escKeyDownHandler);
     this._changeMode();
