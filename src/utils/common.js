@@ -56,3 +56,6 @@ export const makeID = (length) => {
   return result;
 };
 
+export const isOnline = () => {
+  return window.navigator.onLine;
+};

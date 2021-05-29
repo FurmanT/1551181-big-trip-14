@@ -1,8 +1,9 @@
-import PointsModel from './model/points.js';
+import PointsModel from '../model/points.js';
 
 const Method = {
   GET: 'GET',
   PUT: 'PUT',
+  POST: 'POST',
 };
 
 const SuccessHTTPStatusRange = {
@@ -43,6 +44,16 @@ export default class Api {
       .then(PointsModel.adaptToClient);
   }
 
+  sync(data) {
+    return this._load({
+      url: 'points/sync',
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    })
+      .then(Api.toJSON);
+  }
+
   _load({
     url,
     method = Method.GET,
@@ -50,7 +61,6 @@ export default class Api {
     headers = new Headers(),
   }) {
     headers.append('Authorization', this._authorization);
-
     return fetch(
       `${this._endPoint}/${url}`,
       {method, body, headers},

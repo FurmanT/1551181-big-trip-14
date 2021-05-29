@@ -10,6 +10,8 @@ import PointNewPresenter from './point-new';
 import TripHeader from './trip-header';
 import LoadingView from '../view/loading.js';
 import ErrorView from '../view/error.js';
+import {toast} from '../utils/toast.js';
+import {isOnline} from '../utils/common.js';
 
 export default class Trip {
   constructor(tripContainer, tripHeaderContainer, pointsModel, filterModel, offersModel, destinationsModel, api) {
@@ -119,6 +121,10 @@ export default class Trip {
   }
 
   createPoint() {
+    if (!isOnline()) {
+      toast('You can\'t create new point offline');
+      return ;
+    }
     remove(this._noPointsComponent);
     this._currentSortType = SortType.DAY;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
