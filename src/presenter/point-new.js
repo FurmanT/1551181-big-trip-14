@@ -78,7 +78,6 @@ export default class PointNew {
     if(this._formCloseCallback) {
       this._formCloseCallback();
     }
-    // this.destroy();
   }
 
   _handleDeleteClick() {
