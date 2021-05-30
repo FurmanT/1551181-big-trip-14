@@ -62,7 +62,6 @@ const handleSiteMenuClick = (menuItem) => {
 render(pageBodyContainer, statisticsComponent, RenderPosition.BEFOREEND);
 statisticsComponent.hide();
 
-
 api.getDestinations()
   .then((destinations) => {
     destinationsModel.setDestinations(destinations);
