@@ -47,12 +47,8 @@ export default class Point {
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
     this._pointComponent = new PointView(point);
-    this._pointEditComponent = new PointEditView(point, this._offersModel,this._destinationsModel);
     this._pointComponent.setEditClickHandler(this._handleEditClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
-    this._pointEditComponent.setCloseClickHandler(this._handleCloseClick);
-    this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
       return;
@@ -63,7 +59,6 @@ export default class Point {
     }
 
     if (this._mode === Mode.EDITING) {
-      // replace(this._pointEditComponent, prevPointEditComponent);
       replace(this._pointComponent, prevPointEditComponent);
       this._mode = Mode.DEFAULT;
     }
@@ -114,6 +109,11 @@ export default class Point {
       toast('You can\'t edit point offline');
       return;
     }
+    this._pointEditComponent = new PointEditView(this._point, this._offersModel,this._destinationsModel);
+    this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._pointEditComponent.setCloseClickHandler(this._handleCloseClick);
+    this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
+
     replace(this._pointEditComponent, this._pointComponent);
     document.addEventListener('keydown', this._escKeyDownHandler);
     this._changeMode();
