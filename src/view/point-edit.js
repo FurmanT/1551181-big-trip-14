@@ -99,7 +99,7 @@ const createPointEditTemplate = (point, optionsType, destinations) => {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}">
+        <input class="event__input  event__input--price" id="event-price-1" type="number" min="1" name="event-price" value="${price}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit"  ${isSubmitDisabled || isDisabled ? 'disabled' : ''} >
@@ -114,14 +114,15 @@ const createPointEditTemplate = (point, optionsType, destinations) => {
     </header>
     <section class="event__details">
 
-    <section class="event__section  event__section--offers">
+    ${(optionsType.length !== 0) ?
+    `<section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
         <div class="event__available-offers">
-        ${(optionsType.length !== 0) ? createPointEditOptionsTemplate(options, optionsType,isDisabled)  : ''}
+        ${createPointEditOptionsTemplate(options, optionsType,isDisabled)}
         </div>
-      </section>
+    </section>`: ''}
 
-      <section class="event__section  event__section--destination">
+    <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
         <p class="event__destination-description">${destination.description}</p>
       </section>
