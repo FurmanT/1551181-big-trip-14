@@ -5,6 +5,7 @@ import flatpickr from 'flatpickr';
 import he from 'he';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import {isCheckDate} from '../utils/point';
+
 const createPointEditOptionsTemplate = (selectedOptions, typeOptions,  isDisabled  ) => {
   return typeOptions.map((option) => {
     const name = option.title.toLowerCase().replace(/\s/g, '-');
