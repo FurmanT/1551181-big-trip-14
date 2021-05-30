@@ -57,7 +57,7 @@ self.addEventListener('activate', (evt) => {
 
 const handleFetch = (evt) => {
   const {request} = evt;
-  if (event.request.method != 'GET') {
+  if (request.method !== 'GET') {
     return;
   }
   evt.respondWith(
