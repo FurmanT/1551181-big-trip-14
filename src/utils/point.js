@@ -42,3 +42,8 @@ export const generateTripInfo = (points) => {
     price,
   };
 };
+
+
+export const isCheckDate = (dateA, dateB) => {
+  return dayjs(dateA).isBefore(dayjs(dateB));
+};

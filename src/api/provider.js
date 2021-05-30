@@ -49,6 +49,25 @@ export default class Provider {
     return Promise.resolve(point);
   }
 
+  addPoint(point) {
+    if (isOnline()) {
+      return this._api.addPoint(point)
+        .then((newPoint) => {
+          this._store.setItem(newPoint.id, PointsModel.adaptToServer(newPoint));
+          return newPoint;
+        });
+    }
+    return Promise.reject(new Error('Add point failed'));
+  }
+
+  deletePoint(point) {
+    if (isOnline()) {
+      return this._api.deletePoint(point)
+        .then(() => this._store.removeItem(point.id));
+    }
+    return Promise.reject(new Error('Delete point failed'));
+  }
+
   sync() {
     if (isOnline()) {
       const storePoints = Object.values(this._store.getItems());
