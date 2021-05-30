@@ -250,9 +250,11 @@ export default class PointEdit extends SmartView {
     this.getElement()
       .querySelector('.event__input--price')
       .addEventListener('change', this._priceClickHandler);
-    this.getElement()
-      .querySelector('.event__available-offers')
-      .addEventListener('click', this._offersChangeHandler);
+    if (this._offersModel.getOffers().length !== 0 ){
+      this.getElement()
+        .querySelector('.event__available-offers')
+        .addEventListener('click', this._offersChangeHandler);
+    }
   }
 
   _offersChangeHandler(evt) {
