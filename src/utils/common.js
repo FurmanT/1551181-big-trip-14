@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
-// eslint-disable-next-line no-undef
-const duration = require('dayjs/plugin/duration');
+import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
+
 
 export const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));

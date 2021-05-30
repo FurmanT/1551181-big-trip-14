@@ -289,7 +289,7 @@ export default class Statistics extends SmartView {
   }
 
   _setCharts() {
-    if (this._chartMoney !== null || this._chartType != null || this._chartTime!= null) {
+    if (this._chartMoney !== null || this._chartType !== null || this._chartTime!== null) {
       this._chartMoney = null;
       this._chartType = null;
       this._chartTime = null;
