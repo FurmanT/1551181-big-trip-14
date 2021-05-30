@@ -143,6 +143,7 @@ export default class Trip {
       toast('You can\'t create new point offline');
       return ;
     }
+    this._handleModeChange();
     remove(this._noPointsComponent);
     this._currentSortType = SortType.DAY;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
