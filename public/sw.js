@@ -57,10 +57,8 @@ self.addEventListener('activate', (evt) => {
 
 const handleFetch = (evt) => {
   const {request} = evt;
-  if (request.method !== 'GET') {
-    return;
-  }
-  evt.respondWith(
+  if (request.method === 'GET') {
+   evt.respondWith(
     caches.match(request)
       .then((cacheResponse) => {
         if (cacheResponse) {
@@ -78,6 +76,7 @@ const handleFetch = (evt) => {
           });
       }),
   );
+}
 };
 
 self.addEventListener('fetch', handleFetch);

@@ -45,5 +45,4 @@ export default class TripHeader {
   enableNewEventButton() {
     this._newEventComponent.enableButton();
   }
-
 }

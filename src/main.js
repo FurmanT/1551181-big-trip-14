@@ -1,5 +1,4 @@
 import SiteMenuView from './view/site-menu.js';
-import StatisticsView from './view/statistics.js';
 import {render, RenderPosition} from './utils/render.js';
 import Trip from './presenter/trip';
 import PointsModel from './model/points.js';
@@ -7,6 +6,7 @@ import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
 import DestinationsModel from './model/destinations.js';
 import FilterPresenter from './presenter/filter.js';
+import StatisticsPresenter from './presenter/statistics.js';
 import Api from './api/api.js';
 import { makeID } from './utils/common';
 import {MenuItem, UpdateType} from './const';
@@ -43,24 +43,23 @@ siteMenuComponent.setMenuItem(MenuItem.TABLE);
 const filterPresenter = new FilterPresenter(siteFilterElement, filterModel, pointsModel);
 const tripPresenter = new Trip(tripEventsElement, tripMainElement, pointsModel, filterModel, offersModel, destinationsModel, apiWithProvider);
 tripPresenter.init();
-const statisticsComponent = new StatisticsView(pointsModel.getPoints());
+
+const statisticsPresenter = new StatisticsPresenter(pageBodyContainer, pointsModel);
+statisticsPresenter.init();
 
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
     case MenuItem.TABLE:
-      statisticsComponent.hide();
+      statisticsPresenter.hide();
       tripPresenter.checkSortType();
       tripPresenter.showTrip();
       break;
     case MenuItem.STATS:
-      statisticsComponent.show();
+      statisticsPresenter.show();
       tripPresenter.hideTrip();
       break;
   }
 };
-
-render(pageBodyContainer, statisticsComponent, RenderPosition.BEFOREEND);
-statisticsComponent.hide();
 
 api.getDestinations()
   .then((destinations) => {

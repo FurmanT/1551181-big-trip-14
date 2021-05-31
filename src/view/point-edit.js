@@ -45,6 +45,8 @@ const createDestinationTemplate = (current, destinations, isDisabled) => {
 };
 
 const createPointEditTemplate = (point, optionsType, destinations) => {
+
+
   const {
     type,
     destination,
@@ -144,6 +146,7 @@ export default class PointEdit extends SmartView {
   constructor(point = BLANK_POINT, offersModel, destinationsModel) {
     super();
     this._state = PointEdit.parsePointToState(point);
+    this._initialSelect = point.options;
     this._datepickerFrom = null;
     this._datepickerTo = null;
     this._offersModel = offersModel;
@@ -250,7 +253,8 @@ export default class PointEdit extends SmartView {
     this.getElement()
       .querySelector('.event__input--price')
       .addEventListener('change', this._priceClickHandler);
-    if (this._offersModel.getOffers().length !== 0 ){
+
+    if (this._offersModel.getOffers(this._state.type).length !== 0 ){
       this.getElement()
         .querySelector('.event__available-offers')
         .addEventListener('click', this._offersChangeHandler);
@@ -267,6 +271,19 @@ export default class PointEdit extends SmartView {
     const selectOption = this.optionType.filter((element) => {
       return element.title === selectTitleOption;
     });
+
+    const findInInitialOption = this._initialSelect.find((element) => {
+      return element.title === selectTitleOption;
+    });
+
+    if (findInInitialOption) {
+      if (evt.target.previousElementSibling.checked === false  && findInInitialOption){
+        return;
+      }
+    } else {
+      this._initialSelect.push( selectOption[0]);
+    }
+
     const cloneOptionsState = [];
     const options = Object.assign({}, this._state.options);
     for (const key in options) {

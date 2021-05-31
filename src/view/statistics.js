@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
-import SmartView from './smart.js';
+import AbstractView from './abstract';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { TYPES}   from '../const';
-import {getDurationbyMilisec} from '../utils/common' ;
+import {getDurationbyMilisec} from '../utils/common';
 
 const renderMoneyChart = (moneyCtx, points) => {
   const BAR_HEIGHT = 55;
@@ -268,12 +268,10 @@ const createStatisticsTemplate = () => {
         </section>`;
 };
 
-export default class Statistics extends SmartView {
+export default class Statistics extends AbstractView {
   constructor(points) {
     super();
-    this._state = {
-      points,
-    };
+    this._points = points;
     this._chartMoney = null;
     this._chartType = null;
     this._chartTime = null;
@@ -284,25 +282,20 @@ export default class Statistics extends SmartView {
     return createStatisticsTemplate();
   }
 
-  restoreHandlers() {
-    this._setCharts();
-  }
-
   _setCharts() {
     if (this._chartMoney !== null || this._chartType !== null || this._chartTime!== null) {
       this._chartMoney = null;
       this._chartType = null;
       this._chartTime = null;
-
     }
-    const {points} = this._state;
+
     const elementMoneyCtx = this.getElement().querySelector('.statistics__chart--money');
-    this._chartMoney = renderMoneyChart(elementMoneyCtx, points);
+    this._chartMoney = renderMoneyChart(elementMoneyCtx, this._points);
 
     const elementTypeCtx = this.getElement().querySelector('.statistics__chart--transport');
-    this._chartType = renderTypeChart(elementTypeCtx, points);
+    this._chartType = renderTypeChart(elementTypeCtx, this._points);
 
     const elementTimeCtx = this.getElement().querySelector('.statistics__chart--time');
-    this._chartType = renderTimeSpendChart(elementTimeCtx, points);
+    this._chartType = renderTimeSpendChart(elementTimeCtx, this._points);
   }
 }

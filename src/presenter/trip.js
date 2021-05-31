@@ -9,7 +9,6 @@ import {filter} from '../utils/filters.js';
 import PointNewPresenter from './point-new';
 import TripHeader from './trip-header';
 import LoadingView from '../view/loading.js';
-import ErrorView from '../view/error.js';
 import {toast} from '../utils/toast.js';
 import {isOnline} from '../utils/common.js';
 
@@ -28,9 +27,7 @@ export default class Trip {
     this._currentSortType = SortType.DAY;
     this._headerPresenter = new TripHeader(tripHeaderContainer, pointsModel, () => this.createPoint());
     this._isLoading = true;
-    this._isError = false;
     this._loadingComponent = new LoadingView();
-    this._errorComponent = new ErrorView();
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
@@ -74,9 +71,10 @@ export default class Trip {
         break;
       case UserAction.DELETE_POINT:
         this._pointPresenter[update.id].setViewState(PointPresenterViewState.DELETING);
-        this._api.deletePoint(update).then(() => {
-          this._pointsModel.deletePoint(updateType, update);
-        })
+        this._api.deletePoint(update)
+          .then(() => {
+            this._pointsModel.deletePoint(updateType, update);
+          })
           .catch(() => {
             this._pointPresenter[update.id].setViewState(PointPresenterViewState.ABORTING);
           });
@@ -147,7 +145,9 @@ export default class Trip {
     remove(this._noPointsComponent);
     this._currentSortType = SortType.DAY;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+
     this._pointNewPresenter.init(() => this._headerPresenter.enableNewEventButton());
+
   }
 
   _handleModeChange() {
@@ -219,18 +219,14 @@ export default class Trip {
     render(this._tripContainer, this._loadingComponent, RenderPosition.AFTERBEGIN);
   }
 
-  renderError() {
-    render(this._tripContainer, this._errorComponent , RenderPosition.AFTERBEGIN);
-  }
-
   _renderTrip() {
     if (this._isLoading) {
       this._renderLoading();
       return;
     }
+
     const points = this._getPoints();
     const pointsCount = points.length;
-
     if (pointsCount === 0 ){
       this._renderNoPoints();
       this._renderPointList();
