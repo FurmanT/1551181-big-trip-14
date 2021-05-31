@@ -146,7 +146,6 @@ export default class Point {
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       update,
     );
-    // this.replaceFormToCard();
   }
 
   _handleCloseClick() {
