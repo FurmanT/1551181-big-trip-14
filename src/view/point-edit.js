@@ -13,7 +13,7 @@ const createPointEditOptionsTemplate = (selectedOptions, typeOptions,  isDisable
       item.title === option.title))) === -1 ? '' : 'checked') : ('');
     return `<div class="event__offer-selector" ${isDisabled ? 'disabled' : ''}>
      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox"
-           name="event-offer-${name}" ${isChecked}>
+           name="event-offer-${name}" ${isChecked} data-name = "${option.title}">
       <label class="event__offer-label" htmlFor="event-offer-${name}-1">
         <span class="event__offer-title">${option.title}</span>
         &plus;&euro;&nbsp;
@@ -60,9 +60,9 @@ const createPointEditTemplate = (point, optionsType, destinations) => {
   } = point;
 
   const isSubmitDisabled = !isCheckDate(startDate, endDate );
-
   const dateTo =  endDate ? dayjs(endDate).format('DD/MM/YY HH:mm') : '';
   const dateFrom = startDate ? dayjs(startDate).format('DD/MM/YY HH:mm') : '';
+
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -90,11 +90,14 @@ const createPointEditTemplate = (point, optionsType, destinations) => {
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
         <input class="event__input  event__input--time event-start-time-1" id="event-start-time-1" type="text" name="event-start-time"
-        value="${he.encode(dateFrom)}" ${isDisabled ? 'disabled' : ''}>
+        value="${he.encode(dateFrom)}" ${isDisabled ? 'disabled' : ''}
+        >
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
         <input class="event__input  event__input--time event-end-time-1" id="event-end-time-1" type="text" name="event-end-time"
-        value="${he.encode(dateTo)}" ${isDisabled ? 'disabled' : ''}>
+        value="${he.encode(dateTo)}" ${isDisabled ? 'disabled' : ''}
+
+        >
       </div>
 
       <div class="event__field-group  event__field-group--price" ${isDisabled ? 'disabled' : ''}>
@@ -102,7 +105,7 @@ const createPointEditTemplate = (point, optionsType, destinations) => {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="number" min="1" name="event-price" value="${price}">
+        <input class="event__input  event__input--price"   id="event-price-1" type="number" min="1" name="event-price" value="${price}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit"  ${isSubmitDisabled || isDisabled ? 'disabled' : ''} >
@@ -146,7 +149,7 @@ export default class PointEdit extends SmartView {
   constructor(point = BLANK_POINT, offersModel, destinationsModel) {
     super();
     this._state = PointEdit.parsePointToState(point);
-    this._initialSelect = point.options;
+    this._initialSelect = point.options.slice();
     this._datepickerFrom = null;
     this._datepickerTo = null;
     this._offersModel = offersModel;
@@ -168,12 +171,27 @@ export default class PointEdit extends SmartView {
     this.updateData({
       startDate: dayjs(userDate).format('YYYY-MM-DDTHH:mm') ,
     });
+
+    if (!this._state.endDate) {
+      return;
+    }
+    if (!isCheckDate(dayjs(userDate).format('YYYY-MM-DDTHH:mm'), this._state.endDate)) {
+      alert('Пожалуйста заполните корректно даты');
+    }
   }
 
   _endDateChangeHandler([userDate]) {
     this.updateData({
       endDate: dayjs(userDate).format('YYYY-MM-DDTHH:mm') ,
     });
+
+    if (!this._state.startDate) {
+      return;
+    }
+
+    if (!isCheckDate(this._state.startDate, dayjs(userDate).format('YYYY-MM-DDTHH:mm'))) {
+      alert('Заполните корректно даты');
+    }
   }
 
   _setDatepicker() {
@@ -261,50 +279,50 @@ export default class PointEdit extends SmartView {
     }
   }
 
-  _offersChangeHandler(evt) {
-    if (evt.target.tagName !== 'LABEL') {
-      return;
-    }
-    evt.preventDefault();
-    this.optionType = this._offersModel.getOffers(this._state.type);
-    const selectTitleOption = evt.target.firstElementChild.outerText;
-    const selectOption = this.optionType.filter((element) => {
-      return element.title === selectTitleOption;
-    });
-
-    const findInInitialOption = this._initialSelect.find((element) => {
-      return element.title === selectTitleOption;
-    });
-
-    if (findInInitialOption) {
-      if (evt.target.previousElementSibling.checked === false  && findInInitialOption){
-        return;
-      }
-    } else {
-      this._initialSelect.push( selectOption[0]);
-    }
-
-    const cloneOptionsState = [];
-    const options = Object.assign({}, this._state.options);
-    for (const key in options) {
-      cloneOptionsState[key] = Object.assign({}, options[key]);
-    }
-    if (cloneOptionsState.length !== 0){
-      const search = cloneOptionsState.findIndex((option) =>(
-        option.title === selectOption[0].title));
-      if (search === -1) {
-        cloneOptionsState.push(selectOption[0]);
-      } else {
-        cloneOptionsState.splice(search, 1);
-      }
-    }  else {
-      cloneOptionsState.push(selectOption[0]);
-    }
-
-    this.updateData({
-      options: cloneOptionsState,
-    });
-  }
+  // _offersChangeHandler(evt) {
+  //   if (evt.target.tagName !== 'LABEL') {
+  //     return;
+  //   }
+  //   evt.preventDefault();
+  //   this.optionType = this._offersModel.getOffers(this._state.type);
+  //   const selectTitleOption = evt.target.firstElementChild.outerText;
+  //   const selectOption = this.optionType.filter((element) => {
+  //     return element.title === selectTitleOption;
+  //   });
+  //
+  //   const findInInitialOption = this._initialSelect.find((element) => {
+  //     return element.title === selectTitleOption;
+  //   });
+  //
+  //   if (findInInitialOption) {
+  //     if (evt.target.previousElementSibling.checked === false  && findInInitialOption){
+  //       return;
+  //     }
+  //   } else {
+  //     this._initialSelect.push( selectOption[0]);
+  //   }
+  //
+  //   const cloneOptionsState = [];
+  //   const options = Object.assign({}, this._state.options);
+  //   for (const key in options) {
+  //     cloneOptionsState[key] = Object.assign({}, options[key]);
+  //   }
+  //   if (cloneOptionsState.length !== 0){
+  //     const search = cloneOptionsState.findIndex((option) =>(
+  //       option.title === selectOption[0].title));
+  //     if (search === -1) {
+  //       cloneOptionsState.push(selectOption[0]);
+  //     } else {
+  //       cloneOptionsState.splice(search, 1);
+  //     }
+  //   }  else {
+  //     cloneOptionsState.push(selectOption[0]);
+  //   }
+  //
+  //   this.updateData({
+  //     options: cloneOptionsState,
+  //   });
+  // }
 
   _destinationClickHandler(evt) {
     evt.preventDefault();
@@ -378,4 +396,57 @@ export default class PointEdit extends SmartView {
       this._datepicker = null;
     }
   }
+
+  _offersChangeHandler(evt) {
+    evt.preventDefault();
+    let idInput = null;
+    if (evt.target.tagName === 'LABEL') {
+      idInput = evt.target.getAttribute('htmlfor');
+    }
+    if (evt.target.tagName === 'SPAN') {
+      const parentLabel = evt.target.closest('.event__offer-label');
+      idInput = parentLabel.getAttribute('htmlfor');
+    }
+    const elemInput = document.getElementById(idInput);
+    const name = elemInput.dataset.name;
+    this.optionType = this._offersModel.getOffers(this._state.type);
+
+    const selectTitleOption = name;
+    const selectOption = this.optionType.filter((element) => {
+      return element.title === selectTitleOption;
+    });
+
+    const findInInitialOption = this._initialSelect.find((element) => {
+      return element.title === selectTitleOption;
+    });
+
+    if (findInInitialOption) {
+      if (elemInput.checked === false  && findInInitialOption){
+        return;
+      }
+    } else {
+      this._initialSelect.push( selectOption[0]);
+    }
+    const cloneOptionsState = [];
+    const options = Object.assign({}, this._state.options);
+    for (const key in options) {
+      cloneOptionsState[key] = Object.assign({}, options[key]);
+    }
+    if (cloneOptionsState.length !== 0){
+      const search = cloneOptionsState.findIndex((option) =>(
+        option.title === selectOption[0].title));
+      if (search === -1) {
+        cloneOptionsState.push(selectOption[0]);
+      } else {
+        cloneOptionsState.splice(search, 1);
+      }
+    }  else {
+      cloneOptionsState.push(selectOption[0]);
+    }
+
+    this.updateData({
+      options: cloneOptionsState,
+    });
+  }
+
 }

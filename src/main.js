@@ -8,12 +8,11 @@ import DestinationsModel from './model/destinations.js';
 import FilterPresenter from './presenter/filter.js';
 import StatisticsPresenter from './presenter/statistics.js';
 import Api from './api/api.js';
-import { makeID } from './utils/common';
 import {MenuItem, UpdateType} from './const';
 import Store from './api/store.js';
 import Provider from './api/provider.js';
 
-const AUTHORIZATION = `Basic ${makeID(12)}`;
+const AUTHORIZATION = 'Basic Rizg5cX7IWjo';
 const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
 const STORE_PREFIX = 'bigtrip-localstorage';
 const STORE_VER = 'v14';
