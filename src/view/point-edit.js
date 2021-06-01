@@ -279,51 +279,6 @@ export default class PointEdit extends SmartView {
     }
   }
 
-  // _offersChangeHandler(evt) {
-  //   if (evt.target.tagName !== 'LABEL') {
-  //     return;
-  //   }
-  //   evt.preventDefault();
-  //   this.optionType = this._offersModel.getOffers(this._state.type);
-  //   const selectTitleOption = evt.target.firstElementChild.outerText;
-  //   const selectOption = this.optionType.filter((element) => {
-  //     return element.title === selectTitleOption;
-  //   });
-  //
-  //   const findInInitialOption = this._initialSelect.find((element) => {
-  //     return element.title === selectTitleOption;
-  //   });
-  //
-  //   if (findInInitialOption) {
-  //     if (evt.target.previousElementSibling.checked === false  && findInInitialOption){
-  //       return;
-  //     }
-  //   } else {
-  //     this._initialSelect.push( selectOption[0]);
-  //   }
-  //
-  //   const cloneOptionsState = [];
-  //   const options = Object.assign({}, this._state.options);
-  //   for (const key in options) {
-  //     cloneOptionsState[key] = Object.assign({}, options[key]);
-  //   }
-  //   if (cloneOptionsState.length !== 0){
-  //     const search = cloneOptionsState.findIndex((option) =>(
-  //       option.title === selectOption[0].title));
-  //     if (search === -1) {
-  //       cloneOptionsState.push(selectOption[0]);
-  //     } else {
-  //       cloneOptionsState.splice(search, 1);
-  //     }
-  //   }  else {
-  //     cloneOptionsState.push(selectOption[0]);
-  //   }
-  //
-  //   this.updateData({
-  //     options: cloneOptionsState,
-  //   });
-  // }
-
   _destinationClickHandler(evt) {
     evt.preventDefault();
     const selectedDestination = this._destinations.find((destination) => destination.name === evt.target.value);
