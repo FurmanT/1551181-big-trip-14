@@ -1,16 +1,16 @@
 import {render, RenderPosition, remove} from '../utils/render';
 import NoPoints from '../view/no-points';
-import SortView from '../view/sort';
+import SortView from '../view/sort-view';
 import ContainerListView from '../view/container-list';
 import PointPresenter , {State as PointPresenterViewState} from './point';
-import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
-import {sortPointUpPrice, sortPointUpTime, sortPointUpDate} from '../utils/point';
+import {sortPointUpPrice, sortPointUpTime, sortPointDownDate} from '../utils/point';
 import {filter} from '../utils/filters.js';
 import PointNewPresenter from './point-new';
 import TripHeader from './trip-header';
 import LoadingView from '../view/loading.js';
 import {toast} from '../utils/toast.js';
 import {isOnline} from '../utils/common.js';
+import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
 
 export default class Trip {
   constructor(tripContainer, tripHeaderContainer, pointsModel, filterModel, offersModel, destinationsModel, api) {
@@ -53,7 +53,7 @@ export default class Trip {
         this._pointPresenter[update.id].setViewState(PointPresenterViewState.SAVING);
         this._api.updatePoint(update)
           .then((response) => {
-            this._pointsModel.updatePoint(updateType, response);
+            this._pointsModel.update(updateType, response);
           })
           .catch(()=>{
             this._pointPresenter[update.id].setViewState(PointPresenterViewState.ABORTING);
@@ -63,7 +63,7 @@ export default class Trip {
         this._pointNewPresenter.setSaving();
         this._api.addPoint(update)
           .then((response) => {
-            this._pointsModel.addPoint(updateType, response);
+            this._pointsModel.add(updateType, response);
           })
           .catch(() => {
             this._pointNewPresenter.setAborting();
@@ -73,7 +73,7 @@ export default class Trip {
         this._pointPresenter[update.id].setViewState(PointPresenterViewState.DELETING);
         this._api.deletePoint(update)
           .then(() => {
-            this._pointsModel.deletePoint(updateType, update);
+            this._pointsModel.delete(updateType, update);
           })
           .catch(() => {
             this._pointPresenter[update.id].setViewState(PointPresenterViewState.ABORTING);
@@ -121,8 +121,8 @@ export default class Trip {
   }
 
   _getPoints() {
-    const filterType = this._filterModel.getFilter();
-    const points = this._pointsModel.getPoints();
+    const filterType = this._filterModel.get();
+    const points = this._pointsModel.get();
     const filtredPoints = filter[filterType](points);
 
     switch (this._currentSortType) {
@@ -131,7 +131,7 @@ export default class Trip {
       case SortType.TIME:
         return filtredPoints.sort(sortPointUpTime);
       case SortType.DAY:
-        return filtredPoints.sort(sortPointUpDate);
+        return filtredPoints.sort(sortPointDownDate);
     }
     return filtredPoints;
   }
@@ -144,13 +144,13 @@ export default class Trip {
     this._handleModeChange();
     remove(this._noPointsComponent);
     this._currentSortType = SortType.DAY;
-    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-
+    this._filterModel.set(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._pointNewPresenter.init(() => this._headerPresenter.enableNewEventButton());
-
   }
 
   _handleModeChange() {
+    this._pointNewPresenter.destroy();
+
     Object
       .values(this._pointPresenter)
       .forEach((presenter) => presenter.resetView());
@@ -186,6 +186,7 @@ export default class Trip {
   _renderPoint(point) {
     const pointPresenter = new PointPresenter(this._pointListComponent, this._handleViewAction, this._handleModeChange, this._offersModel, this._destinationsModel);
     pointPresenter.init(point);
+
     this._pointPresenter[point.id] = pointPresenter;
   }
 
@@ -226,7 +227,7 @@ export default class Trip {
     }
 
     const points = this._getPoints();
-    const pointsCount = points.length;
+    const pointsCount = this._pointsModel.get().length;
     if (pointsCount === 0 ){
       this._renderNoPoints();
       this._renderPointList();

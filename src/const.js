@@ -43,3 +43,5 @@ export const BLANK_POINT = {
   price: 0,
   isFavorite: false,
 };
+
+export const BAR_HEIGHT = 55;

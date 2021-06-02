@@ -2,11 +2,10 @@ import dayjs from 'dayjs';
 import AbstractView from './abstract';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { TYPES}   from '../const';
+import {TYPES, BAR_HEIGHT}   from '../const';
 import {getDurationbyMilisec} from '../utils/common';
 
 const renderMoneyChart = (moneyCtx, points) => {
-  const BAR_HEIGHT = 55;
   const map = new Map();
   TYPES.forEach((type) => {
     const filterPoint = points.slice().filter((point) => {
@@ -18,7 +17,12 @@ const renderMoneyChart = (moneyCtx, points) => {
     map.set(type, price);
   });
   const mapSort = new Map([...map.entries()].sort((a, b) => b[1] - a[1]));
-  moneyCtx.height = BAR_HEIGHT * 5;
+  for (const [key, value] of mapSort) {
+    if (value === 0){
+      mapSort.delete(key);
+    }
+  }
+  moneyCtx.height = BAR_HEIGHT * mapSort.size;
 
   const moneyChart = new Chart(moneyCtx, {
     plugins: [ChartDataLabels],
@@ -88,8 +92,7 @@ const renderMoneyChart = (moneyCtx, points) => {
 };
 
 const renderTypeChart = (typeCtx, points) => {
-  const BAR_HEIGHT = 55;
-  typeCtx.height = BAR_HEIGHT * 5;
+
 
   const map = new Map();
   TYPES.forEach((type) => {
@@ -100,6 +103,14 @@ const renderTypeChart = (typeCtx, points) => {
   });
 
   const mapSort = new Map([...map.entries()].sort((a, b) => b[1] - a[1]));
+  for (const [key, value] of mapSort) {
+    if (value === 0){
+      mapSort.delete(key);
+    }
+  }
+
+  typeCtx.height = BAR_HEIGHT * mapSort.size;
+
   const typeChart = new Chart(typeCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
@@ -168,9 +179,6 @@ const renderTypeChart = (typeCtx, points) => {
 };
 
 const renderTimeSpendChart = (timeCtx, points) => {
-  const BAR_HEIGHT = 55;
-  timeCtx.height = BAR_HEIGHT * 5;
-
   const map = new Map();
   TYPES.forEach((type) => {
     const filterPoint = points.slice().filter((point) => {
@@ -182,7 +190,15 @@ const renderTimeSpendChart = (timeCtx, points) => {
     }, 0);
     map.set(type, time);
   });
+
+  for (const [key, value] of map) {
+    if (value === 0){
+      map.delete(key);
+    }
+  }
+
   const mapSort = new Map([...map.entries()].sort((a, b) => b[1] - a[1]));
+  timeCtx.height = BAR_HEIGHT * mapSort.size;
   const typeChart = new Chart(timeCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',

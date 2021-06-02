@@ -27,11 +27,15 @@ export default class Abstract {
   }
 
   show(){
-    this._element.classList.remove('visually-hidden');
+    if (this._element !== null){
+      this._element.classList.remove('visually-hidden');
+    }
   }
 
   hide(){
-    this._element.classList.add('visually-hidden');
+    if (this._element !== null) {
+      this._element.classList.add('visually-hidden');
+    }
   }
 
   shake(callback) {

@@ -17,10 +17,11 @@ export default class Statistics {
 
   init() {
     const prevComponent = this._statisticsComponent;
-    const points =  this._pointsModel.getPoints() ;
+    const points =  this._pointsModel.get().slice();
     if (Object.keys(points).length === 0){
       if (prevComponent !== null) {
         remove(prevComponent);
+        this._statisticsComponent = null;
       }
       return;
     }

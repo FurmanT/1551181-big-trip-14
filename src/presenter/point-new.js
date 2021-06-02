@@ -49,6 +49,9 @@ export default class PointNew {
     remove(this._pointEditComponent);
     this._pointEditComponent = null;
     document.removeEventListener('keydown', this._escKeyDownHandler);
+    if(this._formCloseCallback) {
+      this._formCloseCallback();
+    }
   }
 
   setSaving() {

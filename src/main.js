@@ -8,11 +8,11 @@ import DestinationsModel from './model/destinations.js';
 import FilterPresenter from './presenter/filter.js';
 import StatisticsPresenter from './presenter/statistics.js';
 import Api from './api/api.js';
-import {MenuItem, UpdateType} from './const';
 import Store from './api/store.js';
 import Provider from './api/provider.js';
+import {MenuItem, UpdateType} from './const';
 
-const AUTHORIZATION = 'Basic Rizg5cX7IWjo';
+const AUTHORIZATION = 'Basic Tizg7cX7IWjo';
 const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
 const STORE_PREFIX = 'bigtrip-localstorage';
 const STORE_VER = 'v14';
@@ -62,7 +62,7 @@ const handleSiteMenuClick = (menuItem) => {
 
 api.getDestinations()
   .then((destinations) => {
-    destinationsModel.setDestinations(destinations);
+    destinationsModel.set(destinations);
   })
   .catch(() => {
     alert('Произошла ошибка загрузку...');
@@ -70,7 +70,7 @@ api.getDestinations()
 
 api.getOffers()
   .then((offers) => {
-    offersModel.setOffers(offers);
+    offersModel.set(offers);
   })
   .catch(() => {
     alert('Произошла ошибка загрузку...');
@@ -78,13 +78,13 @@ api.getOffers()
 
 apiWithProvider.getPoints()
   .then((points) => {
-    pointsModel.setPoints(UpdateType.INIT, points);
+    pointsModel.set(UpdateType.INIT, points);
     render(siteMenuElement, siteMenuComponent, RenderPosition.BEFOREEND);
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
     filterPresenter.init();
   })
   .catch(() => {
-    pointsModel.setPoints(UpdateType.INIT, []);
+    pointsModel.set(UpdateType.INIT, []);
     render(siteMenuElement, siteMenuComponent, RenderPosition.BEFOREEND);
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
     filterPresenter.init();

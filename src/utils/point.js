@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+dayjs.extend(isSameOrBefore);
 
 export const sortPointUpPrice = (pointA, pointB) => {
   return pointB.price - pointA.price;
@@ -8,11 +10,11 @@ export const sortPointUpTime = (pointA, pointB) => {
   return dayjs(pointB.endDate).diff(dayjs(pointB.startDate)) - dayjs(pointA.endDate).diff(dayjs(pointA.startDate));
 };
 
-export const sortPointUpDate = (pointA, pointB) => {
-  if (pointB === pointA ){
+export const sortPointDownDate = (pointA, pointB) => {
+  if (pointA === pointB ){
     return 0;
   }
-  return dayjs(pointB.startDate).diff(dayjs(pointA.startDate));
+  return dayjs(pointA.startDate).diff(dayjs(pointB.startDate));
 };
 
 export const isDatesEqual = (dateA, dateB) => {
@@ -24,21 +26,23 @@ export const isPointExpired = (date) => {
 };
 
 export const generateTripInfo = (points) => {
-  if (points.length === 0 ) {
+  const pointsSort = points.sort(sortPointDownDate);
+
+  if (pointsSort.length === 0 ) {
     return {};
   }
-  const title = (points.length <= 3) ?
-    points.map((point)=> point.destination.name).join('-') :
-    points[0].destination.name + '- ... -' + points[points.length - 1].destination.name;
 
-  const price = points.reduce((sum , point) => {
+  const title = (pointsSort.length > 3) ?
+    pointsSort[0].destination.name + '- ... -' + pointsSort[points.length - 1].destination.name:
+    pointsSort.map((point)=> point.destination.name).join('-');
+
+  const price = pointsSort.reduce((sum , point) => {
     const offersPrice = point.options.reduce((accumulator , option) => {
       return accumulator  + Number(option.price);
     }, 0);
     return sum  + Number(point.price) + Number(offersPrice);
   }, 0);
-
-  const date =  dayjs(points[0].startDate).format('DD MMM') +'-' +  dayjs(points[points.length - 1].endDate).format('DD MMM');
+  const date =  dayjs(pointsSort[0].startDate).format('DD MMM') +'-' +  dayjs(pointsSort[points.length - 1].endDate).format('DD MMM');
 
   return {
     title,
@@ -47,7 +51,10 @@ export const generateTripInfo = (points) => {
   };
 };
 
-
 export const isCheckDate = (dateA, dateB) => {
   return dayjs(dateA).isBefore(dayjs(dateB));
+};
+
+export const isPointFuture = (date) => {
+  return date === null ? false : dayjs().isSameOrBefore(date, 'D');
 };

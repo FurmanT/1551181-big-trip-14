@@ -1,10 +1,10 @@
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
-import PointView from '../view/point';
+import PointView from '../view/point-view';
 import PointEditView from '../view/point-edit';
-import {UserAction, UpdateType} from '../const.js';
 import { isDatesEqual } from '../utils/point.js';
 import {toast} from '../utils/toast.js';
 import {isOnline} from '../utils/common.js';
+import {UserAction, UpdateType} from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -30,7 +30,7 @@ export default class Point {
     this._handleEditClick = this._handleEditClick.bind(this);
     this._handleCloseClick = this._handleCloseClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
-    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    this._pointEscKeyDownHandler = this._pointEscKeyDownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
     this.handleEventModel = this.handleEventModel.bind(this);
@@ -85,7 +85,7 @@ export default class Point {
         this._pointEditComponent.updateData({
           isDisabled: true,
           isSaving: true,
-        });
+        }, this._mode === Mode.DEFAULT);
         break;
       case State.DELETING:
         this._pointEditComponent.updateData({
@@ -114,23 +114,23 @@ export default class Point {
     }
 
     replace(this._pointEditComponent, this._pointComponent);
-    document.addEventListener('keydown', this._escKeyDownHandler);
+    document.addEventListener('keydown', this._pointEscKeyDownHandler);
     this._changeMode();
     this._mode = Mode.EDITING;
   }
 
   replaceFormToCard() {
     replace(this._pointComponent, this._pointEditComponent);
-    document.removeEventListener('keydown', this._escKeyDownHandler);
+    document.removeEventListener('keydown', this._pointEscKeyDownHandler);
     this._mode = Mode.DEFAULT;
   }
 
-  _escKeyDownHandler(evt) {
+  _pointEscKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this._pointEditComponent.reset(this._point);
       this.replaceFormToCard();
-      document.removeEventListener('keydown', this._escKeyDownHandler);
+      document.removeEventListener('keydown', this._pointEscKeyDownHandler);
     }
   }
 

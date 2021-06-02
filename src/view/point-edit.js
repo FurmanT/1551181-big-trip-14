@@ -1,10 +1,12 @@
-import {TYPES, BLANK_POINT} from '../const';
 import SmartView from './smart.js';
 import dayjs from 'dayjs';
 import flatpickr from 'flatpickr';
 import he from 'he';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import {isCheckDate} from '../utils/point';
+import {TYPES, BLANK_POINT} from '../const';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 const createPointEditOptionsTemplate = (selectedOptions, typeOptions,  isDisabled  ) => {
   return typeOptions.map((option) => {
@@ -45,8 +47,6 @@ const createDestinationTemplate = (current, destinations, isDisabled) => {
 };
 
 const createPointEditTemplate = (point, optionsType, destinations) => {
-
-
   const {
     type,
     destination,
@@ -96,7 +96,6 @@ const createPointEditTemplate = (point, optionsType, destinations) => {
         <label class="visually-hidden" for="event-end-time-1">To</label>
         <input class="event__input  event__input--time event-end-time-1" id="event-end-time-1" type="text" name="event-end-time"
         value="${he.encode(dateTo)}" ${isDisabled ? 'disabled' : ''}
-
         >
       </div>
 
@@ -111,9 +110,14 @@ const createPointEditTemplate = (point, optionsType, destinations) => {
       <button class="event__save-btn  btn  btn--blue" type="submit"  ${isSubmitDisabled || isDisabled ? 'disabled' : ''} >
         ${isSaving ? 'Saving...' : 'Save'}
       </button>
-      <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
+
+    ${(point.id ) ?
+    `<button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
         ${isDeleting ? 'Deleting...' : 'Delete'}
-      </button>
+      </button>`
+    :
+    '<button class="event__reset-btn" type="reset">Cancel</button>'}
+
       <button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>
       </button>
@@ -128,19 +132,20 @@ const createPointEditTemplate = (point, optionsType, destinations) => {
         </div>
     </section>`: ''}
 
-    <section class="event__section  event__section--destination">
+ ${(destination.name !== '') ?
+    `<section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
         <p class="event__destination-description">${destination.description}</p>
-      </section>
-    </section>
 
-    <div class="event__photos-container">
+      <div class="event__photos-container">
       <div class="event__photos-tape">
       ${destination.pictures ?
     (destination.pictures.map((photo) =>
       `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`)) : ''}
       </div>
     </div>
+    </section>` : ''}
+
    </form>
 </li>`;
 };
@@ -149,11 +154,10 @@ export default class PointEdit extends SmartView {
   constructor(point = BLANK_POINT, offersModel, destinationsModel) {
     super();
     this._state = PointEdit.parsePointToState(point);
-    this._initialSelect = point.options.slice();
     this._datepickerFrom = null;
     this._datepickerTo = null;
     this._offersModel = offersModel;
-    this._destinations = destinationsModel.getDestinations();
+    this._destinations = destinationsModel.get();
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteHandler = this._formDeleteHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
@@ -272,7 +276,7 @@ export default class PointEdit extends SmartView {
       .querySelector('.event__input--price')
       .addEventListener('change', this._priceClickHandler);
 
-    if (this._offersModel.getOffers(this._state.type).length !== 0 ){
+    if (this._offersModel.get(this._state.type).length !== 0 ){
       this.getElement()
         .querySelector('.event__available-offers')
         .addEventListener('click', this._offersChangeHandler);
@@ -310,7 +314,7 @@ export default class PointEdit extends SmartView {
   }
 
   getTemplate() {
-    return createPointEditTemplate(this._state, this._offersModel.getOffers(this._state.type), this._destinations);
+    return createPointEditTemplate(this._state, this._offersModel.get(this._state.type), this._destinations);
   }
 
   _formSubmitHandler(evt) {
@@ -354,6 +358,9 @@ export default class PointEdit extends SmartView {
 
   _offersChangeHandler(evt) {
     evt.preventDefault();
+    if (evt.target.tagName === 'DIV') {
+      return;
+    }
     let idInput = null;
     if (evt.target.tagName === 'LABEL') {
       idInput = evt.target.getAttribute('htmlfor');
@@ -364,24 +371,13 @@ export default class PointEdit extends SmartView {
     }
     const elemInput = document.getElementById(idInput);
     const name = elemInput.dataset.name;
-    this.optionType = this._offersModel.getOffers(this._state.type);
+    this.optionType = this._offersModel.get(this._state.type);
 
     const selectTitleOption = name;
     const selectOption = this.optionType.filter((element) => {
       return element.title === selectTitleOption;
     });
 
-    const findInInitialOption = this._initialSelect.find((element) => {
-      return element.title === selectTitleOption;
-    });
-
-    if (findInInitialOption) {
-      if (elemInput.checked === false  && findInInitialOption){
-        return;
-      }
-    } else {
-      this._initialSelect.push( selectOption[0]);
-    }
     const cloneOptionsState = [];
     const options = Object.assign({}, this._state.options);
     for (const key in options) {
